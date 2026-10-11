@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.aws/
+.codex/
+.agents/
+.env
+.env.*
+session_logs/
+logs/

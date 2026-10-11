@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Accountable Drone Agent Prototype</title>
+<style>
+:root{--bg:#eef3f8;--panel:#fff;--ink:#172033;--muted:#637083;--line:#d7e0ea;--blue:#316bd6;--blue2:#eaf2ff;--green:#17805b;--green2:#e8f8f1;--amber:#a66b00;--amber2:#fff6dd;--red:#b93a44;--red2:#fff0f1;--shadow:0 8px 24px rgba(27,45,72,.08)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:linear-gradient(105deg,#173b75,#315fc2);color:white;padding:18px 24px}header h1{margin:0 0 3px;font-size:22px}header p{margin:0;opacity:.88}
+main{padding:16px;max-width:1600px;margin:auto}.grid{display:grid;grid-template-columns:390px minmax(600px,1fr);gap:14px;align-items:start}.stack{display:grid;gap:12px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}.panel-head{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:10px}.panel-head h2,.panel-head h3{margin:0}.panel-body{padding:14px}
+label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5px}input,select,textarea,button{font:inherit}input,select,textarea{width:100%;border:1px solid #c9d4e0;border-radius:8px;padding:9px 10px;background:white;color:var(--ink)}textarea{min-height:88px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.btn{border:0;border-radius:8px;padding:9px 11px;font-weight:750;cursor:pointer;background:#e9eef5;color:#27354a}.btn.primary{background:var(--blue);color:white}.btn.success{background:var(--green);color:white}.btn.warn{background:#ce8a00;color:white}.btn:disabled{opacity:.42;cursor:not-allowed}
+.small{font-size:12px;color:var(--muted)}.note{font-size:12px;background:#f7f9fc;border:1px solid var(--line);border-radius:8px;padding:8px 9px;color:#526074}
+.badge{display:inline-flex;align-items:center;border-radius:999px;padding:3px 8px;font-size:11px;font-weight:800;background:#eef2f7;color:#566376}.badge.good{background:var(--green2);color:var(--green)}.badge.bad{background:var(--red2);color:var(--red)}.badge.warn{background:var(--amber2);color:var(--amber)}
+.pipeline{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:10px 14px;border-bottom:1px solid var(--line);background:#f9fbfd}.pipe{border:1px solid var(--line);border-radius:8px;padding:7px;text-align:center;font-size:11px;font-weight:800;background:white}.pipe.active{border-color:#9eb9ef;background:var(--blue2);color:#2458b3}.pipe.good{border-color:#9ed7c1;background:var(--green2);color:var(--green)}.pipe.bad{border-color:#e5a4aa;background:var(--red2);color:var(--red)}
+.sim-wrap{display:grid;grid-template-columns:minmax(540px,1fr) 270px;gap:12px}canvas{width:100%;height:auto;display:block;border:1px solid #bfcbd8;border-radius:10px;background:#f8fbff;touch-action:none}.toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.toolbar .spacer{flex:1}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 8px;font-size:12px;padding:8px 0;border-bottom:1px dashed #e0e6ed}.truth{font-weight:800}.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);padding:8px 10px 0;background:#f9fbfd;overflow:auto}.tab{padding:7px 10px;border-radius:7px 7px 0 0;border:1px solid transparent;border-bottom:0;background:transparent;cursor:pointer;font-size:12px;font-weight:800;color:#607086;white-space:nowrap}.tab.active{background:white;border-color:var(--line);color:var(--blue)}.tab-content{display:none}.tab-content.active{display:block}pre{margin:0;padding:12px;font:12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;max-height:330px;overflow:auto;background:#fbfcfe}
+.validation-list{display:grid;gap:6px;padding:10px}.check{display:grid;grid-template-columns:24px 1fr;gap:8px;padding:8px;border:1px solid var(--line);border-radius:8px}.check.pass{border-color:#b8e2d1;background:#f5fcf8}.check.fail{border-color:#efb8bd;background:#fff7f7}.check.warn{border-color:#efd79b;background:#fffaf0}.icon{font-weight:900;text-align:center}.status-big{font-size:18px;font-weight:900;padding:10px 12px;border-radius:9px;margin:10px}.status-big.good{background:var(--green2);color:var(--green)}.status-big.bad{background:var(--red2);color:var(--red)}.status-big.warn{background:var(--amber2);color:var(--amber)}
+.log{height:220px;overflow:auto;background:#121a28;color:#d9e5f3;padding:10px;font:11px/1.5 ui-monospace,Menlo,monospace}.log-line{padding:2px 0;border-bottom:1px solid rgba(255,255,255,.05)}.log-line .t{color:#8ba8cc}.log-line.good{color:#86e1b9}.log-line.warn{color:#ffd27a}.log-line.bad{color:#ff9fa8}.contract{font-size:12px}.contract strong{display:block;margin:7px 0 3px}.contract .ok{color:var(--green)}.contract .no{color:var(--red)}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:#55657a}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.footer-note{font-size:11px;color:#68778d;padding:10px 14px;border-top:1px solid var(--line);background:#fafbfd}
+@media(max-width:1100px){.grid{grid-template-columns:1fr}.sim-wrap{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Accountable Drone Agent — Mission Compiler, Validator & Simulator</h1><p>Natural language → constrained mission spec → deterministic validation → PDDL → symbolic plan → verified simulation</p></header>
+<main><div class="grid">
+<div class="stack">
+<section class="panel"><div class="panel-head"><h2>1. LLM + Mission</h2><span class="badge" id="compilerBadge">NOT RUN</span></div><div class="panel-body stack">
+<div class="row"><div><label>LLM provider</label><select id="provider"><option value="openai">OpenAI (GPT API)</option><option value="gemini">Google Gemini</option></select></div><div><label>Model</label><input id="model" value="gpt-6-luna"/></div></div>
+<div><label>API key (prototype only — browser-side keys are not recommended for deployment)</label><input id="apiKey" type="password" autocomplete="off" placeholder="Leave blank to use local demo compiler"/></div>
+<label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="fallbackDemo" type="checkbox" checked style="width:auto"/>Use local demo compiler when API key is blank or API call fails</label>
+<div><label>Mission goal</label><textarea id="mission">Find the red package, inspect it from two viewpoints, pick it up, fly through the gate, place it on the blue platform, and return home.</textarea></div>
+<div class="row"><button class="btn primary" id="generateBtn">Generate Mission Spec</button><button class="btn" id="loadExampleBtn">Load Another Example</button></div>
+<div class="note">The LLM only compiles intent into the constrained schema. It does <b>not</b> authorize execution or generate motor commands. For OpenAI, run <code>prototype_server.py</code> so the browser uses a local proxy instead of calling the API directly.</div>
+</div></section>
+
+<section class="panel"><div class="panel-head"><h2>2. Mission Validation</h2><span class="badge" id="validationBadge">NOT RUN</span></div><div class="panel-body stack">
+<button class="btn success" id="validateBtn" disabled>Validate Mission Spec</button>
+<div class="small">Checks schema, types, vocabulary, capabilities, provenance, assumptions, ambiguity, consistency, ordering, PDDL compilation, reachability and energy reserve.</div>
+</div></section>
+
+<section class="panel"><div class="panel-head"><h2>3. PDDL + Plan</h2><span class="badge" id="planBadge">NOT READY</span></div><div class="panel-body stack">
+<div class="row"><button class="btn" id="pddlBtn" disabled>Generate PDDL</button><button class="btn primary" id="planBtn" disabled>Plan Mission</button></div>
+<button class="btn success" id="runBtn" disabled>Run Plan in Simulator</button>
+<div class="small">The prototype agent uses a deterministic policy controller for replanning. Exported PDDL can later go to Fast Downward/pyperplan. Add: “If the gate is not clear, bypass or ask for human feedback” or “If the gate is blocked, ask me before bypassing.”</div>
+</div></section>
+
+<section class="panel"><div class="panel-head"><h2>Accountability Trace</h2><button class="btn" id="clearLogBtn">Clear</button></div><div class="log" id="eventLog"></div><div class="panel-body"><label>Save to project subdirectory</label><input id="saveDirectory" value="session_logs"/><button id="saveSessionBtn" class="btn">Save session logs and all versions</button><div id="saveStatus" class="small"></div><div id="versionHistory" class="small">No mission versions yet.</div></div></section>
+</div>
+
+<div class="stack">
+<section class="panel">
+<div class="pipeline"><div class="pipe active" id="pipeMission">Mission</div><div class="pipe" id="pipeSpec">Spec</div><div class="pipe" id="pipeValidate">Validate</div><div class="pipe" id="pipePlan">PDDL Plan</div><div class="pipe" id="pipeExecute">Execute</div></div>
+<div class="panel-head"><h2>4. Drone Simulation</h2><div class="toolbar"><span class="badge" id="worldVersionBadge">WORLD v1</span><button class="btn" id="modeBtn">Mode: EDIT</button><button class="btn" id="observeBtn">Refresh Observation</button><button class="btn warn" id="resetWorldBtn">Reset World</button></div></div>
+<div class="panel-body">
+<div class="row"><div><label>World scenario</label><select id="scenario"><option value="1">Scenario 1 — gate clear</option><option value="2">Scenario 2 — gate blocked</option></select></div><div><label>Execution status</label><span id="executionStatus" class="badge">IDLE</span></div></div>
+<div id="humanPanel" hidden class="note"><b>Gate blocked — human decision required</b><p>Approve bypassing the gate and continuing delivery, or abort and return home. No response within 30 seconds selects safe return.</p><button id="approveBypassBtn" class="btn success">Approve bypass</button> <button id="abortMissionBtn" class="btn warn">Abort and return home</button></div>
+<div class="sim-wrap">
+<div><canvas id="sim" width="900" height="520"></canvas>
+<div class="legend" style="margin-top:8px"><span><span class="dot" style="background:#316bd6"></span>Drone</span><span><span class="dot" style="background:#d94848"></span>Target</span><span><span class="dot" style="background:#6c7685"></span>Obstacle</span><span><span class="dot" style="background:#8759c8"></span>Gate</span><span><span class="dot" style="background:#269c75"></span>Platform</span><span><span class="dot" style="background:#111"></span>Home</span></div>
+<div class="small" style="margin-top:6px">EDIT: drag any object. RUN: drag the obstacle or target to inject an environmental change and trigger stale-state/runtime checks.</div></div>
+<div class="stack">
+<div class="panel" style="box-shadow:none"><div class="panel-head"><h3>Ground Truth</h3></div><div class="panel-body" id="truthPanel"></div></div>
+<div class="panel" style="box-shadow:none"><div class="panel-head"><h3>Verified Agent State</h3><span class="badge" id="stateAgeBadge">fresh</span></div><div class="panel-body" id="beliefPanel"></div></div>
+<div class="panel" style="box-shadow:none"><div class="panel-head"><h3>Runtime / Skill Contract</h3></div><div class="panel-body contract" id="contractPanel">No skill executing.</div></div>
+<div><label>Battery</label><input id="battery" type="range" min="10" max="100" value="92"/><div class="small"><span id="batteryValue">92</span>% — safe return reserve: 20%</div></div>
+</div></div></div></section>
+
+<section class="panel">
+<div class="tabs"><button class="tab active" data-tab="specTab">Mission Spec</button><button class="tab" data-tab="validationTab">Validation</button><button class="tab" data-tab="pddlTab">PDDL Problem</button><button class="tab" data-tab="planTab">Robot Plan</button><button class="tab" data-tab="worksheetTab">Worksheet Summary</button></div>
+<div id="specTab" class="tab-content active"><pre id="specOut">Generate a mission specification to begin.</pre></div>
+<div id="validationTab" class="tab-content"><div id="validationOut" class="validation-list"><div class="small">No validation results.</div></div></div>
+<div id="pddlTab" class="tab-content"><pre id="pddlOut">PDDL problem not generated.</pre></div>
+<div id="planTab" class="tab-content"><pre id="planOut">Plan not generated.</pre></div>
+<div id="worksheetTab" class="tab-content"><pre id="worksheetOut"></pre></div>
+<div class="footer-note">Simulation is intentionally 2-D/kinematic and keeps exact simulator ground truth separate from the agent's refreshed verified state.</div>
+</section>
+</div></div></main>
+
+<script>
+"use strict";
+const WORKSHEET_SUMMARY=`AccountableDroneAgent (Genie-Worksheet-inspired)
+
+SUPPORTED SKILLS
+  SEARCH(object)
+  INSPECT(object, viewpoint)
+  PICK(object)
+  NAVIGATE(location)
+  TRAVERSE_GATE(gate)
+  PLACE(object, location)
+  RETURN_HOME()
+  HOVER()
+  LAND()
+
+GLOBAL POLICIES
+  stay inside geofence
+  maintain obstacle clearance
+  preserve safe-return reserve
+  UNKNOWN never satisfies TRUE precondition
+  use only declared skills/vocabulary
+  every generated clause needs provenance
+  no silent assumptions
+  stale state invalidates decision-critical skills
+  runtime verifier may reject/abort an approved skill
+
+See drone_genie_worksheet.txt for the full specification.`;
+document.getElementById("worksheetOut").textContent=WORKSHEET_SUMMARY;
+
+const SUPPORTED_SKILLS=new Set(["SEARCH","INSPECT","PICK","NAVIGATE","TRAVERSE_GATE","PLACE","RETURN_HOME","HOVER","LAND"]);
+const KNOWN_GOALS=new Set(["found","inspected","holding","traversed","placed","at","landed"]);
+const KNOWN_TYPES=new Set(["drone","object","location","region","viewpoint","gate","platform","obstacle"]);
+const VALID_PROVENANCE=new Set(["USER","SYSTEM_POLICY","SKILL_CONTRACT","TASK_SEMANTICS","EXPLICIT_ASSUMPTION"]);
+const SAFE_RETURN_RESERVE=20;
+let missionSpec=null,validationResult=null,pddlProblem="",robotPlan=[],planWorldVersion=null,running=false,editMode=true,worldVersion=1,stopRequested=false;
+
+const worldDefaults={drone:{id:"drone",type:"drone",x:105,y:430,r:16,heading:-.6},target:{id:"red_package",type:"target",x:710,y:390,w:34,h:34},obstacle:{id:"obstacle_1",type:"obstacle",x:360,y:285,w:105,h:72},gate:{id:"gate_1",type:"gate",x:555,y:155,w:130,h:70},platform:{id:"blue_platform",type:"platform",x:760,y:105,w:105,h:52},home:{id:"home",type:"home",x:85,y:455,r:11}};
+let world=JSON.parse(JSON.stringify(worldDefaults));
+let verifiedState={version:0,observedAt:0,targetVisible:"UNKNOWN",targetLocalized:"UNKNOWN",gateClear:"UNKNOWN",holding:false,placed:false,atHome:true,inspectedViews:[],traversedGate:false,battery:92};
+
+const session={session_id:"session_"+Date.now(),started_at:new Date().toISOString(),events:[],versions:[],interrupts:[],human_decisions:[],outcome:"NOT_STARTED"};
+let missionRevision=0,completedGoals=[],executionState="IDLE",humanResolver=null;
+const eventLog=document.getElementById("eventLog");
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));}
+function log(msg,level=""){msg=redactLog(msg);session.events.push({time:new Date().toISOString(),level,message:msg});const d=document.createElement("div");d.className="log-line "+level;d.innerHTML=`<span class="t">${(performance.now()/1000).toFixed(1).padStart(6," ")}s</span>  ${esc(msg)}`;eventLog.appendChild(d);eventLog.scrollTop=eventLog.scrollHeight}
+function badge(id,text,kind=""){const e=document.getElementById(id);e.textContent=text;e.className="badge "+kind}
+function pipe(id,state){document.getElementById(id).className="pipe "+state}
+function tab(id){document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t.dataset.tab===id));document.querySelectorAll(".tab-content").forEach(t=>t.classList.toggle("active",t.id===id))}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>tab(t.dataset.tab));
+
+const MISSION_SCHEMA={type:"object",additionalProperties:false,required:["mission_id","user_goal","entities","goals","ordering","constraints","assumptions","unresolved","requested_capabilities"],properties:{
+mission_id:{type:"string"},user_goal:{type:"string"},
+entities:{type:"array",items:{type:"object",additionalProperties:false,required:["id","type","source"],properties:{id:{type:"string"},type:{type:"string"},source:{type:"string"}}}},
+goals:{type:"array",items:{type:"object",additionalProperties:false,required:["id","predicate","args","source","source_text"],properties:{id:{type:"string"},predicate:{type:"string"},args:{type:"array",items:{type:"string"}},source:{type:"string"},source_text:{type:"string"}}}},
+ordering:{type:"array",items:{type:"object",additionalProperties:false,required:["before","after","source"],properties:{before:{type:"string"},after:{type:"string"},source:{type:"string"}}}},
+constraints:{type:"array",items:{type:"object",additionalProperties:false,required:["name","type","params","source"],properties:{name:{type:"string"},type:{type:"string"},params:{type:"object",additionalProperties:false,required:["degrees"],properties:{degrees:{type:["number","null"]}}},source:{type:"string"}}}},
+assumptions:{type:"array",items:{type:"object",additionalProperties:false,required:["text","source"],properties:{text:{type:"string"},source:{type:"string"}}}},
+unresolved:{type:"array",items:{type:"object",additionalProperties:false,required:["text","reason"],properties:{text:{type:"string"},reason:{type:"string"}}}},
+requested_capabilities:{type:"array",items:{type:"string"}}}};
+
+function compilerPrompt(goal){return `You are a mission compiler for an accountable drone agent.
+Use ONLY skills SEARCH, INSPECT, PICK, NAVIGATE, TRAVERSE_GATE, PLACE, RETURN_HOME, HOVER, LAND.
+Use ONLY goal predicates found(object), inspected(object,viewpoint), holding(object), traversed(gate), placed(object,location), at(location), landed(drone).
+Entity types: drone, object, location, region, viewpoint, gate, platform, obstacle.
+Every USER goal needs exact source_text. Do not silently invent requirements; put ambiguity in unresolved[].
+If user requests unsupported behavior, include a short uppercase name in requested_capabilities.
+Use red_package, blue_platform, gate_1, home, view_a, view_b when corresponding entities appear.
+For N requested viewpoints, create exactly N inspected goals with distinct viewpoint IDs (view_a, view_b, view_c, etc.) and matching viewpoint entities. For multiple viewpoints include a SYSTEM_POLICY constraint minimum_view_separation_deg=30. Never reduce the requested viewpoint count.
+Constraint params must contain degrees: use 30 for minimum_view_separation_deg, or null when degrees does not apply. Put constraints requiring unsupported parameters in unresolved[] rather than inventing parameter fields.
+If user says return/home, use at(home). If placement/delivery, capabilities include PICK and PLACE.
+If fly through/traverse gate, include traversed(gate_1). Ordering must reflect task semantics.
+
+USER MISSION:
+${primaryGoal(goal)}
+
+Return JSON only matching the schema.`}
+
+document.getElementById("provider").onchange=e=>document.getElementById("model").value=e.target.value==="openai"?"gpt-6-luna":"gemini-3.8-flash";
+
+async function callLocalProxy(provider,key,model,goal){
+ if(location.protocol==="file:")return null;
+ try{
+   const r=await fetch("/api/llm",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({provider,api_key:key,model,goal,prompt:compilerPrompt(goal),schema:MISSION_SCHEMA})});
+   if([404,405,501].includes(r.status))return null;
+   if(!r.ok)throw new Error(`Local LLM proxy ${r.status}: ${(await r.text()).slice(0,1200)}`);
+   const data=await r.json();
+   if(!data.text)throw new Error("Local LLM proxy returned no text.");
+   return JSON.parse(stripFence(data.text));
+ }catch(e){
+   // Connection failures mean the static page is probably not running with prototype_server.py.
+   if(String(e.message||e).includes("Failed to fetch"))return null;
+   throw e;
+ }
+}
+
+async function callOpenAI(key,model,goal){
+ const proxied=await callLocalProxy("openai",key,model,goal);
+ if(proxied)return proxied;
+ log("Local proxy unavailable; attempting direct OpenAI browser call (prototype only).","warn");
+ const body={
+   model,
+   instructions:"Compile the user drone mission into the supplied JSON schema. Do not invent unsupported capabilities or facts.",
+   input:compilerPrompt(goal),
+   text:{format:{type:"json_schema",name:"drone_mission_spec",strict:true,schema:MISSION_SCHEMA}}
+ };
+ const r=await fetch("https://api.openai.com/v1/responses",{
+   method:"POST",
+   headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+   body:JSON.stringify(body)
+ });
+ if(!r.ok){
+   const errText=await r.text();
+   throw new Error(`OpenAI API ${r.status}: ${errText.slice(0,1200)}`);
+ }
+ const data=await r.json();
+ let text=data.output_text||"";
+ if(!text){
+   for(const item of(data.output||[]))for(const c of(item.content||[]))if(c.type==="output_text"&&c.text)text+=c.text;
+ }
+ if(!text)throw new Error("OpenAI returned no output_text. Check model access and API response in the accountability trace.");
+ return JSON.parse(stripFence(text));
+}
+function geminiResponseSchema(schema){
+ const result={...schema};delete result.additionalProperties;
+ if(Array.isArray(result.type)){
+   const types=result.type.filter(t=>t!=="null");
+   if(types.length!==1)throw new Error("Gemini schema requires one non-null type");
+   if(result.type.includes("null"))result.nullable=true;
+   result.type=types[0];
+ }
+ if(typeof result.type==="string")result.type=result.type.toUpperCase();
+ if(result.properties){result.properties=Object.fromEntries(Object.entries(result.properties).map(([k,v])=>[k,geminiResponseSchema(v)]));result.propertyOrdering=Object.keys(result.properties)}
+ if(result.items)result.items=geminiResponseSchema(result.items);
+ return result;
+}
+async function callGemini(key,model,goal){
+ const proxied=await callLocalProxy("gemini",key,model,goal);
+ if(proxied)return proxied;
+ const body={
+   contents:[{role:"user",parts:[{text:compilerPrompt(goal)}]}],
+   generationConfig:{
+     responseMimeType:"application/json",
+     responseSchema:geminiResponseSchema(MISSION_SCHEMA)
+   }
+ };
+ const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,{
+   method:"POST",
+   headers:{"Content-Type":"application/json","x-goog-api-key":key},
+   body:JSON.stringify(body)
+ });
+ if(!r.ok){
+   const errText=await r.text();
+   throw new Error(`Gemini API ${r.status}: ${errText.slice(0,1200)}`);
+ }
+ const data=await r.json();
+ const text=(data.candidates?.[0]?.content?.parts||[]).map(p=>p.text||"").join("");
+ if(!text)throw new Error("No Gemini text returned.");
+ return JSON.parse(stripFence(text));
+}
+function stripFence(t){t=t.trim();if(t.startsWith("```"))t=t.replace(/^```(?:json)?\s*/,"").replace(/\s*```$/,"");return t}
+
+// Provider-output compatibility layer. Structured output is requested from both APIs,
+// but this also repairs common legacy/model variations before deterministic validation.
+function normalizeSource(v, fallback="USER"){
+ const x=String(v||fallback).trim().toUpperCase().replace(/[ -]+/g,"_");
+ const map={USER_INPUT:"USER",MISSION:"USER",USER:"USER",POLICY:"SYSTEM_POLICY",SYSTEM:"SYSTEM_POLICY",SYSTEM_POLICY:"SYSTEM_POLICY",TASK:"TASK_SEMANTICS",TASK_SEMANTICS:"TASK_SEMANTICS",SKILL:"SKILL_CONTRACT",SKILL_CONTRACT:"SKILL_CONTRACT",ASSUMPTION:"EXPLICIT_ASSUMPTION",EXPLICIT_ASSUMPTION:"EXPLICIT_ASSUMPTION"};
+ return map[x]||fallback;
+}
+function parsePredicateExpr(expr){
+ const s=String(expr||"").trim();
+ const m=s.match(/^([A-Za-z_][A-Za-z0-9_-]*)\s*\((.*)\)\s*$/);
+ if(!m)return {predicate:s,args:[]};
+ return {predicate:m[1].toLowerCase().replace(/-/g,"_"),args:m[2].split(",").map(x=>x.trim()).filter(Boolean)};
+}
+function sourceTextForGoal(goal,predicate){
+ const rules={found:/\b(find|search|locate)[^,.]*/i,inspected:/\binspect[^,.]*/i,holding:/\b(pick|grab)[^,.]*/i,traversed:/[^,.]*\bgate\b[^,.]*/i,placed:/\b(place|put|deliver)[^,.]*/i,at:/\b(return|come back|go home)[^,.]*/i,landed:/\bland[^,.]*/i};
+ const m=goal.match(rules[predicate]||/$^/); return m?m[0].trim():goal;
+}
+function inferCapabilities(goals){
+ const c=new Set();
+ for(const g of goals){
+   if(g.predicate==="found")c.add("SEARCH");
+   if(g.predicate==="inspected")c.add("INSPECT");
+   if(g.predicate==="holding")c.add("PICK");
+   if(g.predicate==="traversed"){c.add("TRAVERSE_GATE");c.add("NAVIGATE")}
+   if(g.predicate==="placed"){c.add("PICK");c.add("NAVIGATE");c.add("PLACE")}
+   if(g.predicate==="at"){c.add("RETURN_HOME");c.add("NAVIGATE")}
+   if(g.predicate==="landed")c.add("LAND");
+ }
+ return [...c];
+}
+function inferEntities(goals,goalText){
+ const out=[],seen=new Set(); const add=(id,type,source="USER")=>{if(id&&!seen.has(id)){seen.add(id);out.push({id,type,source})}};
+ add("drone","drone","SYSTEM_POLICY"); add("home","location","SYSTEM_POLICY");
+ for(const g of goals)for(const a of(g.args||[])){
+   if(a==="drone")add(a,"drone","SYSTEM_POLICY");
+   else if(a==="home")add(a,"location","SYSTEM_POLICY");
+   else if(/^view[_-]/i.test(a))add(a,"viewpoint","SYSTEM_POLICY");
+   else if(/gate/i.test(a))add(a,"gate","USER");
+   else if(/platform|pad/i.test(a))add(a,"platform","USER");
+   else add(a,"object","USER");
+ }
+ if(/gate/i.test(goalText))add("gate_1","gate","USER");
+ if(/platform|pad/i.test(goalText))add("blue_platform","platform","USER");
+ return out;
+}
+function inferOrdering(goals){
+ const out=[]; const byPred=p=>goals.filter(g=>g.predicate===p); const add=(a,b)=>{if(a&&b&&!out.some(x=>x.before===a.id&&x.after===b.id))out.push({before:a.id,after:b.id,source:"TASK_SEMANTICS"})};
+ const found=byPred("found")[0], inspected=byPred("inspected"), holding=byPred("holding")[0], traversed=byPred("traversed")[0], placed=byPred("placed")[0], home=byPred("at").find(g=>g.args?.[0]==="home"), landed=byPred("landed")[0];
+ inspected.forEach(g=>add(found,g));
+ if(holding){ if(inspected.length)inspected.forEach(g=>add(g,holding)); else add(found,holding); }
+ if(traversed)add(holding||inspected.at(-1)||found,traversed);
+ if(placed)add(traversed||holding||inspected.at(-1)||found,placed);
+ if(home)add(placed||traversed||holding||inspected.at(-1)||found,home);
+ if(landed)add(home||placed||traversed||holding||inspected.at(-1)||found,landed);
+ return out;
+}
+
+function normalizeMissionSpec(raw,userGoal){
+ raw=(raw&&typeof raw==="object")?(raw.mission_spec||raw.spec||raw):{};
+ const goalText=String(userGoal||raw.user_goal||raw.mission_goal||raw.mission||raw.goal_text||"");
+ const rawGoals=Array.isArray(raw.goals)?raw.goals:(Array.isArray(raw.objectives)?raw.objectives:[]);
+ const goals=rawGoals.map((g,i)=>{
+   if(typeof g==="string")g={predicate:g};
+   const parsed=parsePredicateExpr(g.predicate||g.expression||g.goal||g.name||"");
+   const pred=(g.args&&parsed.args.length===0)?String(g.predicate||"").toLowerCase():parsed.predicate;
+   const args=Array.isArray(g.args)?g.args.map(String):parsed.args;
+   return {id:String(g.id||g.goal_id||`G${i+1}`),predicate:pred,args,source:normalizeSource(g.source||g.provenance||"USER"),source_text:String(g.source_text||g.evidence||g.user_text||sourceTextForGoal(goalText,pred))};
+ }).filter(g=>g.predicate);
+
+ let ordering=Array.isArray(raw.ordering)?raw.ordering:(Array.isArray(raw.ordering_constraints)?raw.ordering_constraints:[]);
+ ordering=ordering.map(o=>{
+   if(typeof o==="string"){
+     const m=o.match(/([A-Za-z0-9_-]+)\s*(?:before|<|->)\s*([A-Za-z0-9_-]+)/i); if(!m)return null;
+     return {before:m[1],after:m[2],source:"TASK_SEMANTICS"};
+   }
+   return {before:String(o.before||o.predecessor||o.from||""),after:String(o.after||o.successor||o.to||""),source:normalizeSource(o.source||o.provenance||"TASK_SEMANTICS","TASK_SEMANTICS")};
+ }).filter(o=>o&&o.before&&o.after);
+ if(!ordering.length)ordering=inferOrdering(goals);
+
+ const constraints=[];
+ for(const c of(Array.isArray(raw.constraints)?raw.constraints:[])){
+   if(c&&typeof c==="object"&&(c.before||c.after)){ordering.push({before:String(c.before||""),after:String(c.after||""),source:normalizeSource(c.source||"TASK_SEMANTICS","TASK_SEMANTICS")});continue}
+   if(typeof c==="string")constraints.push({name:c,type:"declarative",params:{},source:"SYSTEM_POLICY"});
+   else if(c&&typeof c==="object")constraints.push({name:String(c.name||c.id||c.constraint||"constraint"),type:String(c.type||"declarative"),params:(c.params&&typeof c.params==="object")?c.params:{},source:normalizeSource(c.source||c.provenance||"SYSTEM_POLICY","SYSTEM_POLICY")});
+ }
+
+ if(requestedViewCount(goalText)>1 && goals.filter(g=>g.predicate==="inspected").length>=2 && !constraints.some(c=>c.name==="minimum_view_separation_deg"))
+   constraints.push({name:"minimum_view_separation_deg",type:"geometry",params:{degrees:30},source:"SYSTEM_POLICY"});
+
+ let entities=Array.isArray(raw.entities)?raw.entities.map(e=>typeof e==="string"?{id:e,type:"object",source:"USER"}:{id:String(e.id||e.name||""),type:String(e.type||"object").toLowerCase(),source:normalizeSource(e.source||e.provenance||"USER")}).filter(e=>e.id):[];
+ if(!entities.length)entities=inferEntities(goals,goalText);
+
+ let caps=raw.requested_capabilities||raw.capabilities||raw.skills||[]; if(!Array.isArray(caps))caps=[caps];
+ caps=caps.map(x=>typeof x==="string"?x:(x?.name||x?.skill||"")).map(x=>String(x).trim().split("(")[0].toUpperCase().replace(/[ -]+/g,"_")).filter(Boolean);
+ if(!caps.length)caps=inferCapabilities(goals);
+
+ const assumptions=(Array.isArray(raw.assumptions)?raw.assumptions:[]).map(a=>typeof a==="string"?{text:a,source:"EXPLICIT_ASSUMPTION"}:{text:String(a.text||a.assumption||""),source:normalizeSource(a.source||a.provenance||"EXPLICIT_ASSUMPTION","EXPLICIT_ASSUMPTION")}).filter(a=>a.text);
+ const unresolved=(Array.isArray(raw.unresolved)?raw.unresolved:(Array.isArray(raw.ambiguities)?raw.ambiguities:[])).map(u=>typeof u==="string"?{text:u,reason:"Model marked this item unresolved."}:{text:String(u.text||u.item||u.issue||""),reason:String(u.reason||u.explanation||"Model marked this item unresolved.")}).filter(u=>u.text);
+
+ return {mission_id:String(raw.mission_id||raw.id||`mission_${Date.now()}`),user_goal:goalText,entities,goals,ordering,constraints,assumptions,unresolved,requested_capabilities:[...new Set(caps)]};
+}
+
+function requestedViewCount(text){
+ const m=String(text).match(/\b(\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\s+(?:distinct\s+)?(?:viewpoints?|views?)\b/i);
+ if(!m)return null;const words=["one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve"];
+ return /^\d+$/.test(m[1])?Number(m[1]):words.indexOf(m[1].toLowerCase())+1;
+}
+function inspectionGoals(spec){
+ const goals=(spec.goals||[]).filter(g=>g.predicate==="inspected"),seen=new Set();
+ for(const g of goals){if(g.args?.length!==2||!g.args[1])throw new Error("Inspection requires an object and viewpoint ID.");const key=JSON.stringify(g.args);if(seen.has(key))throw new Error("Inspection viewpoints must be distinct.");seen.add(key)}
+ if(!spec.revision_context&&requestedViewCount(spec.user_goal)!==null&&goals.length!==requestedViewCount(spec.user_goal))throw new Error("Inspection goal count does not match the requested viewpoints.");
+ if(goals.length>12)throw new Error("Simulator supports at most 12 viewpoints with 30-degree separation.");
+ return goals;
+}
+function source(text,rx){const m=text.match(rx);return m?m[0].trim():""}
+function localCompile(text){
+ const t=primaryGoal(text).toLowerCase(),entities=[],goals=[],ordering=[],constraints=[],assumptions=[],unresolved=[],caps=new Set(),seen=new Set();let gid=1;
+ const ent=(id,type,src="USER")=>{if(!seen.has(id)){entities.push({id,type,source:src});seen.add(id)}};
+ const addGoal=(predicate,args,srcText)=>{const g={id:"G"+gid++,predicate,args,source:"USER",source_text:srcText};goals.push(g);return g.id};
+ ent("drone","drone","SYSTEM_POLICY");ent("home","location","SYSTEM_POLICY");
+ const target=/red (box|package|object|target)/.test(t)?"red_package":"target_object";if(/box|package|object|target/.test(t))ent(target,"object");
+ if(/platform|pad/.test(t))ent("blue_platform","platform");if(/gate/.test(t))ent("gate_1","gate");
+ let gf=null,ga=null,gb=null,gh=null,gg=null,gp=null,ghome=null,gland=null;
+ if(/find|search|locate/.test(t)){caps.add("SEARCH");gf=addGoal("found",[target],source(text,/find[^,.]*/i)||source(text,/search[^,.]*/i)||"find target")}
+ if(/inspect/.test(t)){caps.add("INSPECT");const n=requestedViewCount(text)||1;
+   if(n<1||n>12)unresolved.push({text:"Viewpoint count",reason:"Simulator supports 1 to 12 distinct viewpoints."});
+   else for(let i=0;i<n;i++){const view="view_"+String.fromCharCode(97+i);ent(view,"viewpoint","SYSTEM_POLICY");const id=addGoal("inspected",[target,view],source(text,/inspect[^,.]*/i)||"inspect");if(i===0)ga=id;gb=id;if(gf)ordering.push({before:gf,after:id,source:"TASK_SEMANTICS"})}
+   if(n>1)constraints.push({name:"minimum_view_separation_deg",type:"geometry",params:{degrees:30},source:"SYSTEM_POLICY"});}
+ if(/pick|pickup|pick it up|grab/.test(t)){caps.add("PICK");gh=addGoal("holding",[target],source(text,/(pick|grab)[^,.]*/i)||"pick target");if(ga)ordering.push({before:ga,after:gh,source:"TASK_SEMANTICS"});if(gb)ordering.push({before:gb,after:gh,source:"TASK_SEMANTICS"})}
+ if(/through the gate|traverse.*gate|fly through.*gate/.test(t)){caps.add("TRAVERSE_GATE");caps.add("NAVIGATE");gg=addGoal("traversed",["gate_1"],source(text,/[^,.]*gate[^,.]*/i)||"traverse gate");if(gh)ordering.push({before:gh,after:gg,source:"TASK_SEMANTICS"})}
+ if(/place|put .* on|deliver/.test(t)){caps.add("PLACE");caps.add("NAVIGATE");caps.add("PICK");gp=addGoal("placed",[target,"blue_platform"],source(text,/(place|put|deliver)[^,.]*/i)||"place target");if(gg)ordering.push({before:gg,after:gp,source:"TASK_SEMANTICS"});else if(gh)ordering.push({before:gh,after:gp,source:"TASK_SEMANTICS"})}
+ if(/return|come back|go home/.test(t)){caps.add("RETURN_HOME");caps.add("NAVIGATE");ghome=addGoal("at",["home"],source(text,/(return|come back|go home)[^,.]*/i)||"return home");const prior=gp||gg||gh||gb||ga||gf;if(prior)ordering.push({before:prior,after:ghome,source:"TASK_SEMANTICS"})}
+ if(/\bland\b/.test(t)){caps.add("LAND");gland=addGoal("landed",["drone"],source(text,/land[^,.]*/i)||"land");const prior=ghome||gp||gg||gh||gb||ga||gf;if(prior)ordering.push({before:prior,after:gland,source:"TASK_SEMANTICS"})}
+ [[/\bopen\b/,"OPEN"],[/paint/,"PAINT"],[/unlock/,"UNLOCK"],[/\bcut\b/,"CUT"]].forEach(([rx,c])=>{if(rx.test(t))caps.add(c)});
+ if(/carefully|thoroughly|properly/.test(t))unresolved.push({text:"Qualitative inspection modifier",reason:"No measurable policy is defined for this term."});
+ if(!goals.length)unresolved.push({text:"No supported mission goal recognized",reason:"Mission did not map to prototype goal vocabulary."});
+ return {mission_id:"mission_"+Date.now(),user_goal:text,entities,goals,ordering:inferOrdering(goals),constraints,assumptions,unresolved,requested_capabilities:[...caps]};
+}
+
+document.getElementById("generateBtn").onclick=async()=>{
+ const goal=document.getElementById("mission").value.trim();if(!goal)return alert("Enter a mission goal.");
+ missionSpec=null;validationResult=null;pddlProblem="";robotPlan=[];document.getElementById("generateBtn").disabled=true;badge("compilerBadge","COMPILING","warn");pipe("pipeSpec","active");log("Mission compilation started.");
+ try{const provider=document.getElementById("provider").value,key=document.getElementById("apiKey").value.trim(),model=document.getElementById("model").value.trim();
+   if(key){try{const rawSpec=provider==="openai"?await callOpenAI(key,model,goal):await callGemini(key,model,goal);missionSpec=normalizeMissionSpec(rawSpec,goal);log(`Mission spec generated by ${provider} (${model}) and normalized to canonical schema.`,"good")}catch(e){log("API failed: "+e.message,"bad");if(document.getElementById("fallbackDemo").checked){missionSpec=normalizeMissionSpec(localCompile(goal),goal);log("Fell back to local demo compiler.","warn")}else throw e}}
+   else{if(!document.getElementById("fallbackDemo").checked)throw new Error("API key is blank.");missionSpec=normalizeMissionSpec(localCompile(goal),goal);log("Mission spec generated by local demo compiler.","good")}
+   missionSpec.contingencies=compileContingencies(goal);missionRevision++;completedGoals=[];session.outcome="NOT_STARTED";setExecutionState("IDLE");recordVersion("MISSION_SPEC");
+   document.getElementById("specOut").textContent=JSON.stringify(missionSpec,null,2);badge("compilerBadge","SPEC READY","good");pipe("pipeSpec","good");document.getElementById("validateBtn").disabled=false;document.getElementById("pddlBtn").disabled=true;document.getElementById("planBtn").disabled=true;document.getElementById("runBtn").disabled=true;tab("specTab");
+ }catch(e){badge("compilerBadge","FAILED","bad");pipe("pipeSpec","bad");log(e.message,"bad");alert(e.message)}finally{document.getElementById("generateBtn").disabled=false}
+};
+
+function detectCycle(edges){
+ const adj=new Map();for(const e of edges){if(!adj.has(e.before))adj.set(e.before,[]);adj.get(e.before).push(e.after)}
+ const temp=new Set(),perm=new Set(),stack=[];
+ function dfs(n){if(perm.has(n))return null;if(temp.has(n)){const i=stack.indexOf(n);return stack.slice(i).concat(n)}temp.add(n);stack.push(n);for(const m of(adj.get(n)||[])){const c=dfs(m);if(c)return c}stack.pop();temp.delete(n);perm.add(n);return null}
+ for(const n of adj.keys()){const c=dfs(n);if(c)return c}return null
+}
+function sanitize(s){return String(s).toLowerCase().replace(/[^a-z0-9_-]/g,"_")}
+function compilePddl(spec){
+ const obj=(spec.entities||[]).find(e=>e.type==="object")?.id||"red_package",gate=(spec.entities||[]).find(e=>e.type==="gate")?.id||"gate_1",platform=(spec.entities||[]).find(e=>e.type==="platform")?.id||"blue_platform";
+ const views=[...new Set([...inspectionGoals(spec).map(g=>sanitize(g.args[1])),...(spec.revision_context?.state.inspectedViews||[]).map(key=>sanitize(JSON.parse(key)[1]))])];
+ const O=sanitize(obj),G=sanitize(gate),P=sanitize(platform),goalLines=[];
+ const hasPlacement=(spec.goals||[]).some(g=>g.predicate==="placed");
+ for(const g of(spec.goals||[])){
+  if(g.predicate==="found")goalLines.push(`(found ${O})`);
+  else if(g.predicate==="inspected")goalLines.push(`(inspected ${sanitize(g.args[0])} ${sanitize(g.args[1])})`);
+  else if(g.predicate==="holding"&&!hasPlacement)goalLines.push(`(holding drone ${O})`);
+  else if(g.predicate==="traversed")goalLines.push(`(traversed ${G})`);
+  else if(g.predicate==="placed")goalLines.push(`(placed ${O} ${P})`);
+  else if(g.predicate==="at")goalLines.push(`(at drone home)`);
+  else if(g.predicate==="landed")goalLines.push(`(landed drone)`);
+ }
+ if(!goalLines.length)throw new Error("No PDDL-compilable goals.");
+ return `(define (problem accountable-drone-mission)
+  (:domain accountable-drone)
+  (:objects
+    drone - drone
+    ${O} - object
+    home current_loc target_loc gate_loc ${P} - location
+    ${G} - gate${views.length?"\n    "+views.join(" ")+" - viewpoint":""})
+  (:init
+    ${pddlInitialState(spec,O,G,P).join("\n    ")})
+  (:goal (and
+    ${goalLines.join("\n    ")}
+  ))
+)`;
+}
+function buildPlan(spec){
+ if(!spec)return{ok:false,reason:"No mission spec.",plan:[]};
+ const unsupported=(spec.requested_capabilities||[]).filter(c=>!SUPPORTED_SKILLS.has(c));if(unsupported.length)return{ok:false,reason:"Unsupported capabilities: "+unsupported.join(", "),plan:[]};
+ const obj=(spec.entities||[]).find(e=>e.type==="object")?.id||"red_package",platform=(spec.entities||[]).find(e=>e.type==="platform")?.id||"blue_platform",gate=(spec.entities||[]).find(e=>e.type==="gate")?.id||"gate_1",gs=spec.goals||[],plan=[];
+ const push=(skill,args=[],why="")=>plan.push({step:plan.length+1,skill,args,why});
+ const needFound=gs.some(g=>g.predicate==="found"||["inspected","holding","placed"].includes(g.predicate)),ins=gs.filter(g=>g.predicate==="inspected"&&!isGoalCompleted(spec,g)),needHold=gs.some(g=>g.predicate==="holding"||g.predicate==="placed"),needGate=gs.some(g=>g.predicate==="traversed"),needPlace=gs.some(g=>g.predicate==="placed"),needHome=gs.some(g=>g.predicate==="at"&&g.args?.[0]==="home"),needLand=gs.some(g=>g.predicate==="landed");
+ if(needFound&&!spec.revision_context?.state.targetLocalized&&!spec.revision_context?.state.holding&&!gs.some(g=>g.predicate==="found"&&isGoalCompleted(spec,g)))push("SEARCH",[obj],"Establish found/visible/localized target state.");
+ try{inspectionGoals(spec)}catch(e){return{ok:false,reason:e.message,plan:[]}}
+ for(const g of ins)push("INSPECT",[...g.args],`Satisfy inspection goal ${g.id} at ${g.args[1]}.`);
+ if((needHold||needPlace)&&!spec.revision_context?.state.holding&&!spec.revision_context?.state.placed){push("NAVIGATE",["target_loc"],"Reach target before pickup.");push("PICK",[obj],"Acquire target object.");}
+ if(needGate&&!spec.revision_context?.state.traversedGate){push("NAVIGATE",["gate_loc"],"Reach gate.");push("TRAVERSE_GATE",[gate],"Satisfy gate traversal goal.");}
+ if(needPlace&&!spec.revision_context?.state.placed){push("NAVIGATE",[platform],"Reach delivery platform.");push("PLACE",[obj,platform],"Satisfy placement goal.");}
+ if(needHome&&!spec.revision_context?.state.atHome)push("RETURN_HOME",[],"Satisfy return-home goal.");
+ if(needLand)push("LAND",[],"Satisfy landing goal.");
+ return (plan.length||(spec.revision_context&&gs.every(g=>isGoalCompleted(spec,g)||(g.predicate==="at"&&g.args[0]==="home"&&spec.revision_context.state.atHome))))?{ok:true,plan}:{ok:false,reason:"No executable steps could be derived.",plan:[]}
+}
+function dist(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function resolveLocation(id){if(id==="target_loc"||id==="red_package"||id==="target_object")return world.target;if(id==="gate_loc"||id==="gate_1")return world.gate;if(id==="blue_platform")return world.platform;if(id==="home")return world.home;return null}
+function estimateEnergy(plan){let e=0;for(const a of(plan||[])){if(a.skill==="SEARCH")e+=5;else if(a.skill==="INSPECT")e+=3;else if(a.skill==="PICK")e+=4;else if(a.skill==="TRAVERSE_GATE")e+=3;else if(a.skill==="PLACE")e+=2;else if(a.skill==="LAND")e+=1;else if(a.skill==="RETURN_HOME")e+=dist(world.drone,world.home)/90;else if(a.skill==="NAVIGATE"){const d=resolveLocation(a.args[0]);e+=d?dist(world.drone,d)/90:4}}return Math.round(e*10)/10}
+
+function validate(spec){
+ const checks=[];let hard=false,clarify=false;const add=(name,status,detail)=>checks.push({name,status,detail});
+ const req=["mission_id","user_goal","entities","goals","ordering","constraints","assumptions","unresolved","requested_capabilities"],missing=req.filter(k=>!(k in(spec||{})));
+ if(missing.length){add("V1 Schema shape","fail","Missing: "+missing.join(", "));hard=true}else add("V1 Schema shape","pass","Required top-level fields are present.");
+ const bt=(spec.entities||[]).filter(e=>!KNOWN_TYPES.has(e.type));if(bt.length){add("V2 Entity/type validation","fail","Unknown: "+bt.map(e=>e.id+":"+e.type).join(", "));hard=true}else add("V2 Entity/type validation","pass","All entity types are known.");
+ const bp=(spec.goals||[]).filter(g=>!KNOWN_GOALS.has(g.predicate));if(bp.length){add("V3 Predicate vocabulary","fail","Unknown: "+bp.map(g=>g.predicate).join(", "));hard=true}else add("V3 Predicate vocabulary","pass","All goal predicates are known.");
+ const uns=(spec.requested_capabilities||[]).filter(c=>!SUPPORTED_SKILLS.has(c));if(uns.length){add("V4 Capability grounding","fail","Unsupported: "+uns.join(", "));hard=true}else add("V4 Capability grounding","pass","All requested capabilities map to declared skills.");
+ const prov=[];for(const g of(spec.goals||[])){if(!VALID_PROVENANCE.has(g.source))prov.push(g.id+" invalid source");if(g.source==="USER"&&!g.source_text?.trim())prov.push(g.id+" missing USER source_text")}for(const c of(spec.constraints||[]))if(!VALID_PROVENANCE.has(c.source))prov.push(c.name+" invalid source");
+ if(prov.length){add("V5 Provenance","fail",prov.join("; "));hard=true}else add("V5 Provenance","pass","Every generated clause has allowed provenance.");
+ const badAss=(spec.assumptions||[]).filter(a=>a.source!=="EXPLICIT_ASSUMPTION");if(badAss.length){add("V6 Assumptions","fail","Assumptions must be explicitly labeled.");hard=true}else if((spec.assumptions||[]).length){add("V6 Assumptions","warn",`${spec.assumptions.length} explicit assumption(s) require review.`);clarify=true}else add("V6 Assumptions","pass","No silent assumptions declared.");
+ if((spec.unresolved||[]).length){add("V7 Ambiguity / UNKNOWN","warn",spec.unresolved.map(x=>x.text+": "+x.reason).join("; "));clarify=true}else add("V7 Ambiguity / UNKNOWN","pass","No unresolved mission semantics.");
+ const holding=(spec.goals||[]).find(g=>g.predicate==="holding"),placed=(spec.goals||[]).find(g=>g.predicate==="placed");
+ let badHoldingAfterPlace=false;
+ if(holding&&placed){badHoldingAfterPlace=(spec.ordering||[]).some(o=>o.before===placed.id&&o.after===holding.id)}
+ if(badHoldingAfterPlace){add("V8 Logical consistency","fail","Ordering requires the object to be placed before a later holding milestone, which conflicts with PLACE releasing the object.");hard=true}else add("V8 Logical consistency","pass","Milestones and terminal effects are mutually consistent. Intermediate holding is allowed before placement.");
+ const cycle=detectCycle(spec.ordering||[]);if(cycle){add("V9 Ordering consistency","fail","Cycle: "+cycle.join(" -> "));hard=true}else add("V9 Ordering consistency","pass","Ordering constraints are acyclic.");
+ try{const x=compilePddl(spec);if(!x.includes("(define (problem"))throw new Error("PDDL generation failed");add("V10 PDDL compilation","pass","Mission maps into fixed accountable-drone domain.")}catch(e){add("V10 PDDL compilation","fail",e.message);hard=true}
+ const pr=buildPlan(spec);if(!pr.ok){add("V11 Symbolic reachability","fail",pr.reason);hard=true}else add("V11 Symbolic reachability","pass",`Found ${pr.plan.length}-step symbolic plan.`);
+ const energy=estimateEnergy(pr.plan),battery=Number(document.getElementById("battery").value);if(energy+SAFE_RETURN_RESERVE>battery){add("V12 Energy reserve","fail",`Mission ${energy.toFixed(1)}% + reserve ${SAFE_RETURN_RESERVE}% > battery ${battery}%.`);hard=true}else add("V12 Energy reserve","pass",`Mission ${energy.toFixed(1)}%; battery ${battery}%; reserve ${SAFE_RETURN_RESERVE}%.`);
+ return{status:hard?"REJECTED":clarify?"NEEDS_CLARIFICATION":"ACCEPTED",checks,energy}
+}
+function renderValidation(r){const out=document.getElementById("validationOut");out.innerHTML="";const s=document.createElement("div");s.className="status-big "+(r.status==="ACCEPTED"?"good":r.status==="REJECTED"?"bad":"warn");s.textContent=r.status;out.appendChild(s);for(const c of r.checks){const d=document.createElement("div");d.className="check "+c.status;d.innerHTML=`<div class="icon">${c.status==="pass"?"✓":c.status==="fail"?"✕":"!"}</div><div><b>${esc(c.name)}</b><div class="small">${esc(c.detail)}</div></div>`;out.appendChild(d)}}
+document.getElementById("validateBtn").onclick=()=>{if(!missionSpec)return;validationResult=validate(missionSpec);recordVersion("VALIDATION");renderValidation(validationResult);tab("validationTab");pipe("pipeValidate",validationResult.status==="ACCEPTED"?"good":"bad");if(validationResult.status==="ACCEPTED"){badge("validationBadge","ACCEPTED","good");document.getElementById("pddlBtn").disabled=false;document.getElementById("planBtn").disabled=false;log("Mission specification ACCEPTED.","good")}else if(validationResult.status==="NEEDS_CLARIFICATION"){badge("validationBadge","CLARIFY","warn");log("Mission requires clarification.","warn")}else{badge("validationBadge","REJECTED","bad");log("Mission specification REJECTED.","bad")}};
+
+document.getElementById("pddlBtn").onclick=()=>{if(validationResult?.status!=="ACCEPTED")return;pddlProblem=compilePddl(missionSpec);document.getElementById("pddlOut").textContent=pddlProblem;recordVersion("PDDL");tab("pddlTab");log("PDDL problem generated.","good")};
+document.getElementById("planBtn").onclick=()=>{if(validationResult?.status!=="ACCEPTED")return;pddlProblem=compilePddl(missionSpec);document.getElementById("pddlOut").textContent=pddlProblem;const r=buildPlan(missionSpec);if(!r.ok)return log("Planning failed: "+r.reason,"bad");robotPlan=r.plan;planWorldVersion=worldVersion;recordVersion("ROBOT_PLAN");document.getElementById("planOut").textContent=JSON.stringify({mission_id:missionSpec.mission_id,mission_status:"VALIDATED",planned_against_world_version:planWorldVersion,estimated_energy_percent:estimateEnergy(robotPlan),plan:robotPlan},null,2);badge("planBadge","PLAN READY","good");pipe("pipePlan","good");document.getElementById("runBtn").disabled=false;tab("planTab");log(`Plan generated: ${robotPlan.length} steps against WORLD v${planWorldVersion}.`,"good")};
+
+const canvas=document.getElementById("sim"),ctx=canvas.getContext("2d");let dragObj=null,dx=0,dy=0;
+function rectHit(o,x,y){return x>=o.x-o.w/2&&x<=o.x+o.w/2&&y>=o.y-o.h/2&&y<=o.y+o.h/2}
+function segRect(x1,y1,x2,y2,r){const rx1=r.x-r.w/2,rx2=r.x+r.w/2,ry1=r.y-r.h/2,ry2=r.y+r.h/2;for(let i=0;i<=80;i++){const t=i/80,x=x1+(x2-x1)*t,y=y1+(y2-y1)*t;if(x>=rx1&&x<=rx2&&y>=ry1&&y<=ry2)return true}return false}
+function obstacles(){return [world.obstacle,...(world.gateObstacle?[world.gateObstacle]:[])]}
+function targetVisible(){return dist(world.drone,world.target)<=330&&!obstacles().some(o=>segRect(world.drone.x,world.drone.y,world.target.x,world.target.y,o))}
+function computeGateClear(){const g=world.gate;return !obstacles().some(o=>Math.abs(o.x-g.x)<(o.w+g.w)/2&&Math.abs(o.y-g.y)<(o.h+g.h)/2)}
+const OBSTACLE_CLEARANCE=22;
+function blocked(x,y){const m=OBSTACLE_CLEARANCE;return obstacles().some(o=>x>=o.x-o.w/2-m&&x<=o.x+o.w/2+m&&y>=o.y-o.h/2-m&&y<=o.y+o.h/2+m)}
+function motionBlocked(a,b){
+ return obstacles().some(o=>{const m=OBSTACLE_CLEARANCE;let lo=0,hi=1;
+ for(const [start,delta,min,max] of [[a.x,b.x-a.x,o.x-o.w/2-m,o.x+o.w/2+m],[a.y,b.y-a.y,o.y-o.h/2-m,o.y+o.h/2+m]]){
+ if(delta===0){if(start<min||start>max)return false;continue}
+ const t1=(min-start)/delta,t2=(max-start)/delta;lo=Math.max(lo,Math.min(t1,t2));hi=Math.min(hi,Math.max(t1,t2));if(lo>hi)return false;
+ }return true});
+}
+function planMotion(s,dest){
+ if(blocked(s.x,s.y)||blocked(dest.x,dest.y))throw new Error("No safe route: start or destination is inside obstacle clearance.");
+ const m=OBSTACLE_CLEARANCE+16;
+ const corners=obstacles().flatMap(o=>[{x:o.x-o.w/2-m,y:o.y-o.h/2-m},{x:o.x+o.w/2+m,y:o.y-o.h/2-m},{x:o.x-o.w/2-m,y:o.y+o.h/2+m},{x:o.x+o.w/2+m,y:o.y+o.h/2+m}]).filter(p=>!blocked(p.x,p.y)&&p.x>=world.drone.r&&p.x<=canvas.width-world.drone.r&&p.y>=world.drone.r&&p.y<=canvas.height-world.drone.r);
+ const nodes=[s,{x:dest.x,y:dest.y},...corners],cost=nodes.map(()=>Infinity),prev=nodes.map(()=>-1),visited=new Set();cost[0]=0;
+ while(visited.size<nodes.length){
+   let u=-1;for(let i=0;i<nodes.length;i++)if(!visited.has(i)&&(u<0||cost[i]<cost[u]))u=i;
+   if(u<0||!Number.isFinite(cost[u]))break;if(u===1)break;visited.add(u);
+   for(let v=0;v<nodes.length;v++)if(!visited.has(v)&&!motionBlocked(nodes[u],nodes[v])){const next=cost[u]+dist(nodes[u],nodes[v]);if(next<cost[v]){cost[v]=next;prev[v]=u}}
+ }
+ if(!Number.isFinite(cost[1]))throw new Error("No safe route around obstacle within simulation bounds.");
+ const route=[];for(let i=1;i!==0;i=prev[i])route.unshift(nodes[i]);return route;
+}
+function rrect(x,y,w,h,r,fill){ctx.beginPath();ctx.roundRect(x,y,w,h,r);if(fill)ctx.fill()}
+function drawDrone(x,y,h){ctx.save();ctx.translate(x,y);ctx.rotate(h);ctx.strokeStyle="#2458b3";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-18,-12);ctx.lineTo(18,12);ctx.moveTo(-18,12);ctx.lineTo(18,-12);ctx.stroke();ctx.fillStyle="#316bd6";ctx.beginPath();ctx.arc(0,0,11,0,Math.PI*2);ctx.fill();ctx.fillStyle="#123d8a";ctx.beginPath();ctx.moveTo(10,0);ctx.lineTo(-5,-6);ctx.lineTo(-5,6);ctx.closePath();ctx.fill();ctx.restore()}
+function draw(){
+ ctx.clearRect(0,0,canvas.width,canvas.height);ctx.strokeStyle="#e5edf5";ctx.lineWidth=1;
+ for(let x=0;x<canvas.width;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke()}for(let y=0;y<canvas.height;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke()}
+ ctx.save();ctx.setLineDash([5,6]);ctx.strokeStyle="rgba(49,107,214,.28)";ctx.beginPath();ctx.arc(world.drone.x,world.drone.y,330,0,Math.PI*2);ctx.stroke();ctx.restore();
+ ctx.fillStyle="#111";ctx.beginPath();ctx.arc(world.home.x,world.home.y,world.home.r,0,Math.PI*2);ctx.fill();ctx.font="12px sans-serif";ctx.fillText("HOME",world.home.x+15,world.home.y+4);
+ ctx.fillStyle="#45b890";rrect(world.platform.x-world.platform.w/2,world.platform.y-world.platform.h/2,world.platform.w,world.platform.h,8,true);ctx.fillStyle="#0e5b43";ctx.fillText("BLUE PLATFORM",world.platform.x-world.platform.w/2,world.platform.y-world.platform.h/2-8);
+ const g=world.gate;ctx.fillStyle="#7a54b6";ctx.fillRect(g.x-g.w/2,g.y-g.h/2,12,g.h);ctx.fillRect(g.x+g.w/2-12,g.y-g.h/2,12,g.h);ctx.fillRect(g.x-g.w/2,g.y-g.h/2,g.w,10);ctx.fillStyle="#62459a";ctx.fillText("GATE",g.x-15,g.y+g.h/2+17);
+ for(const o of obstacles()){ctx.fillStyle="#6c7685";rrect(o.x-o.w/2,o.y-o.h/2,o.w,o.h,7,true);ctx.fillStyle="#414a57";ctx.fillText("OBSTACLE",o.x-33,o.y+4)}
+ ctx.fillStyle="#d94848";rrect(world.target.x-world.target.w/2,world.target.y-world.target.h/2,world.target.w,world.target.h,5,true);ctx.fillStyle="#9d2424";ctx.fillText("RED PACKAGE",world.target.x-42,world.target.y+35);
+ const vis=targetVisible();ctx.save();ctx.setLineDash([4,4]);ctx.strokeStyle=vis?"#38a57a":"#d36a72";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(world.drone.x,world.drone.y);ctx.lineTo(world.target.x,world.target.y);ctx.stroke();ctx.restore();drawDrone(world.drone.x,world.drone.y,world.drone.heading);
+ ctx.fillStyle="#637083";ctx.font="11px sans-serif";ctx.fillText(`WORLD v${worldVersion} | target visible=${vis} | gate clear=${computeGateClear()}`,12,18);requestAnimationFrame(draw)
+}
+function pos(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height}}
+function pickObj(x,y){const a=[world.drone,world.target,...obstacles(),world.gate,world.platform,world.home];for(let i=a.length-1;i>=0;i--){const o=a[i];if(o.r&&Math.hypot(x-o.x,y-o.y)<=o.r+9)return o;if(o.w&&rectHit(o,x,y))return o}return null}
+canvas.onpointerdown=e=>{const p=pos(e),o=pickObj(p.x,p.y);if(!o)return;if(running&&!["obstacle","target"].includes(o.type))return;dragObj=o;dx=p.x-o.x;dy=p.y-o.y;canvas.setPointerCapture(e.pointerId)}
+canvas.onpointermove=e=>{if(!dragObj)return;const p=pos(e);dragObj.x=Math.max(20,Math.min(canvas.width-20,p.x-dx));dragObj.y=Math.max(20,Math.min(canvas.height-20,p.y-dy))}
+canvas.onpointerup=e=>{if(!dragObj)return;const id=dragObj.id;dragObj=null;bumpWorld("User moved "+id)}
+function bumpWorld(reason){worldVersion++;badge("worldVersionBadge","WORLD v"+worldVersion,"warn");log(`${reason}; world version -> ${worldVersion}.`,"warn");updatePanels()}
+
+function kv(k,v){return `<div class="kv"><span>${esc(k)}</span><span class="truth">${esc(v)}</span></div>`}
+function updatePanels(){
+ document.getElementById("truthPanel").innerHTML=kv("target visible",targetVisible())+kv("gate clear",computeGateClear())+kv("holding package",verifiedState.holding)+kv("package placed",verifiedState.placed)+kv("drone x,y",`${Math.round(world.drone.x)}, ${Math.round(world.drone.y)}`)+kv("battery",document.getElementById("battery").value+"%");
+ document.getElementById("beliefPanel").innerHTML=kv("state version","v"+verifiedState.version)+kv("target visible",verifiedState.targetVisible)+kv("target localized",verifiedState.targetLocalized)+kv("gate clear",verifiedState.gateClear)+kv("holding package",verifiedState.holding)+kv("placed",verifiedState.placed)+kv("at home",verifiedState.atHome);
+ const stale=verifiedState.version!==worldVersion;badge("stateAgeBadge",stale?"STALE":"FRESH",stale?"warn":"good")
+}
+function refreshObservation(reason="manual"){
+ verifiedState.version=worldVersion;verifiedState.observedAt=Date.now();verifiedState.targetVisible=targetVisible();verifiedState.targetLocalized=verifiedState.targetVisible;verifiedState.gateClear=computeGateClear();verifiedState.atHome=dist(world.drone,world.home)<35;verifiedState.battery=Number(document.getElementById("battery").value);updatePanels();log(`Verified state refreshed (${reason}), WORLD v${worldVersion}.`,"good")
+}
+document.getElementById("observeBtn").onclick=()=>refreshObservation("user requested");
+document.getElementById("battery").oninput=e=>{document.getElementById("batteryValue").textContent=e.target.value;verifiedState.battery=Number(e.target.value);updatePanels()};
+
+function contractFor(a){return{SEARCH:["battery reserve OK"],INSPECT:["target visible","target localized","state fresh","obstacle clear"],PICK:["target visible","target localized","gripper empty","state fresh","battery reserve OK"],NAVIGATE:["destination reachable","state fresh","obstacle clear","battery reserve OK"],TRAVERSE_GATE:["gate clear","state fresh","obstacle clear"],PLACE:["holding object","at destination","obstacle clear"],RETURN_HOME:["home reachable","obstacle clear"],LAND:["safe landing available"]}[a.skill]||[]}
+function runtimeVerify(a){
+ const fail=[],stale=verifiedState.version!==worldVersion;if(stale&&!["SEARCH","HOVER","LAND"].includes(a.skill))fail.push(`verified state v${verifiedState.version} stale vs WORLD v${worldVersion}`);
+ if(["INSPECT","PICK"].includes(a.skill)){if(verifiedState.targetVisible!==true)fail.push("target_visible is not VERIFIED_TRUE");if(verifiedState.targetLocalized!==true)fail.push("target_localized is not VERIFIED_TRUE")}
+ if((a.skill==="TRAVERSE_GATE"||(a.skill==="NAVIGATE"&&a.args[0]==="gate_loc"))&&verifiedState.gateClear!==true)fail.push("gate_clear is not VERIFIED_TRUE");if(a.skill==="PLACE"&&!verifiedState.holding)fail.push("holding(target) is FALSE");
+ if(Number(document.getElementById("battery").value)<=SAFE_RETURN_RESERVE&&!["RETURN_HOME","LAND","HOVER"].includes(a.skill))fail.push("battery reserve violated");
+ return{ok:!fail.length,fail}
+}
+function renderContract(a,status,fail=[]){document.getElementById("contractPanel").innerHTML=`<b>${esc(a.skill)}(${esc(a.args.join(", "))})</b><div class="small">Status: <b>${esc(status)}</b></div><strong>Contract checks</strong>${contractFor(a).map(x=>`<div class="${fail.length?"no":"ok"}">${fail.length?"○":"✓"} ${esc(x)}</div>`).join("")}${fail.length?`<strong>Failed</strong>${fail.map(x=>`<div class="no">✕ ${esc(x)}</div>`).join("")}`:""}`}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function animate(dest,duration){return new Promise((resolve,reject)=>{const sx=world.drone.x,sy=world.drone.y,t0=performance.now(),v0=worldVersion;function step(now){if(stopRequested)return reject(new Error("Stopped."));if(worldVersion!==v0){refreshObservation("environment changed during motion");return reject(new Error(`world changed during execution (v${v0} -> v${worldVersion}); replan required`))}const t=Math.min(1,(now-t0)/duration),nx=sx+(dest.x-sx)*t,ny=sy+(dest.y-sy)*t;if(blocked(nx,ny))return reject(new Error("runtime obstacle-clearance violation"));world.drone.heading=Math.atan2(dest.y-sy,dest.x-sx);world.drone.x=nx;world.drone.y=ny;if(verifiedState.holding){world.target.x=nx+24;world.target.y=ny+20}if(t<1)requestAnimationFrame(step);else resolve()}requestAnimationFrame(step)})}
+async function move(dest,duration){
+ const s={x:world.drone.x,y:world.drone.y},pts=planMotion(s,dest);for(const q of pts)await animate(q,duration/pts.length)
+}
+async function skill(a){
+ if(a.skill==="SEARCH"){await move({x:Math.max(60,world.target.x-190),y:Math.min(canvas.height-60,world.target.y+80)},1300);return}
+ if(a.skill==="INSPECT"){
+   const views=inspectionGoals(missionSpec),i=views.findIndex(g=>g.args[0]===a.args[0]&&g.args[1]===a.args[1]);if(i<0)throw new Error("Unknown inspection viewpoint.");
+   const ang=views.length===2?(i===0?Math.PI:Math.PI/2):Math.PI+i*2*Math.PI/views.length;
+   const dest={x:world.target.x+110*Math.cos(ang),y:world.target.y+110*Math.sin(ang)};
+   if(dest.x<world.drone.r||dest.x>canvas.width-world.drone.r||dest.y<world.drone.r||dest.y>canvas.height-world.drone.r)throw new Error("Inspection viewpoint is outside simulation bounds.");
+   await move(dest,1100);verifiedState.inspectedViews.push(JSON.stringify(a.args));return;
+ }
+ if(a.skill==="NAVIGATE"){const d=resolveLocation(a.args[0]);if(!d)throw new Error("Unknown destination");await move(d,1400);return}
+ if(a.skill==="PICK"){await move(world.target,850);verifiedState.holding=true;return}
+ if(a.skill==="TRAVERSE_GATE"){if(!computeGateClear())throw new Error("Gate became blocked.");await move({x:world.gate.x,y:world.gate.y+70},700);await move({x:world.gate.x,y:world.gate.y-70},700);verifiedState.traversedGate=true;return}
+ if(a.skill==="PLACE"){if(!verifiedState.holding)throw new Error("Cannot place: object not held.");await move(world.platform,750);world.target.x=world.platform.x;world.target.y=world.platform.y;verifiedState.holding=false;verifiedState.placed=true;bumpWorld("Package placed on platform");return}
+ if(a.skill==="RETURN_HOME"){await move(world.home,1600);verifiedState.atHome=true;return}
+ if(a.skill==="LAND"){await sleep(600);return}
+}
+function drain(a){let c=1;if(a.skill==="SEARCH")c=3;else if(a.skill==="INSPECT")c=2;else if(a.skill==="PICK")c=3;else if(["NAVIGATE","RETURN_HOME"].includes(a.skill))c=4;else if(a.skill==="TRAVERSE_GATE")c=2;const b=document.getElementById("battery");b.value=Math.max(10,Number(b.value)-c);document.getElementById("batteryValue").textContent=b.value;verifiedState.battery=Number(b.value)}
+async function executePlan(){
+ if(!robotPlan.length||running)return;running=true;editMode=false;stopRequested=false;setExecutionState("EXECUTING");setRunControls(true);updateMode();pipe("pipeExecute","active");refreshObservation("execution start");
+ let replans=0;
+ try{
+   for(let i=0;i<robotPlan.length;){
+     if(stopRequested)throw new Error("Stopped.");const a=robotPlan[i];refreshObservation("precondition check for "+a.skill);const v=runtimeVerify(a);
+     try{
+       if(!v.ok)throw new Error(v.fail.join("; "));
+       renderContract(a,"EXECUTING");log(`Step ${i+1}/${robotPlan.length}: ${a.skill}(${a.args.join(", ")}) accepted.`,"good");
+       await skill(a);markCompleted(a);refreshObservation("postcondition check for "+a.skill);renderContract(a,"VERIFIED SUCCESS");log(`Postcondition verified for ${a.skill}(${a.args.join(", ")}).`,"good");drain(a);i++;await sleep(200);
+     }catch(e){
+       if(stopRequested)throw e;
+       if(++replans>3)throw new Error("Recovery limit reached; execution stopped safely.");
+       await handleInterrupt(a,e.message);i=0;
+     }
+   }
+   const missing=missionSpec.goals.filter(g=>!completedGoals.includes(g.id));if(missing.length)throw new Error("Unfulfilled mission goals: "+missing.map(g=>g.id).join(", "));
+   session.outcome=missionSpec.revision_context?.decision==="ABORT_AND_RETURN_HOME"?"MISSION_ABORTED_SAFE_RETURN_COMPLETED":missionSpec.revision_context?.decision==="LAND"?"MISSION_ABORTED_SAFE_LANDING_COMPLETED":missionSpec.revision_context?.decision==="BYPASS_GATE"?"MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS":"MISSION_COMPLETED";
+   setExecutionState(session.outcome);pipe("pipeExecute","good");log(session.outcome,"good");recordVersion("EXECUTION_COMPLETED");
+ }catch(e){session.outcome="MISSION_INCOMPLETE_HALTED";setExecutionState("HALTED");pipe("pipeExecute","bad");log("Execution halted: "+e.message,"bad");recordVersion("EXECUTION_HALTED")}
+ finally{running=false;editMode=true;setRunControls(false);document.getElementById("runBtn").disabled=true;document.getElementById("planBtn").disabled=true;updateMode();document.getElementById("contractPanel").textContent="No skill executing."}
+}
+document.getElementById("runBtn").onclick=executePlan;
+
+function updateMode(){const b=document.getElementById("modeBtn");b.textContent="Mode: "+(editMode?"EDIT":"RUN");b.className="btn "+(editMode?"":"success")}
+document.getElementById("modeBtn").onclick=()=>{if(!running){editMode=!editMode;updateMode()}};
+document.getElementById("resetWorldBtn").onclick=()=>applyScenario();
+document.getElementById("scenario").onchange=()=>applyScenario();
+document.getElementById("clearLogBtn").onclick=()=>eventLog.innerHTML="";
+document.getElementById("loadExampleBtn").onclick=()=>{const ex=["Find the red package and return home.","Find the red package, inspect it from two viewpoints, pick it up, place it on the blue platform, and return home.","Find the red package, open it, inspect the contents, and return home.","Inspect the red package carefully and return home."];const ta=document.getElementById("mission"),i=(ex.indexOf(ta.value)+1)%ex.length;ta.value=ex[i]};
+
+function clone(value){return JSON.parse(JSON.stringify(value))}
+function redactLog(message){const key=document.getElementById("apiKey").value;return key?String(message).split(key).join("[REDACTED]"):String(message)}
+function primaryGoal(text){return String(text).split(/\bif\s+(?:the\s+)?gate\b/i)[0].trim()}
+function compileContingencies(text){
+ const clause=String(text).match(/\bif\s+(?:the\s+)?gate\s+(?:is\s+)?(?:not clear|blocked|obstructed)[\s\S]*/i)?.[0]||"";
+ const bypass=/\bbypass\b/i.test(clause),ask=/\b(ask|human|feedback|approval)\b/i.test(clause),approvalFirst=/before|approval|ask\s+(?:me|the human|a human)\s+(?:before|to approve)/i.test(clause);
+ const action=ask&&(!bypass||approvalFirst)?"ASK_HUMAN":bypass?"BYPASS_GATE":"ABORT_AND_RETURN_HOME";
+ return [{trigger:"gate_not_clear",action,fallback:ask&&bypass&&!approvalFirst?"ASK_HUMAN":"ABORT_AND_RETURN_HOME",authorization:clause?"USER":"SYSTEM_POLICY",source_text:clause||"Default policy: abort remaining mission and return home.",waive_goals:action==="BYPASS_GATE"?"traversed(gate_1)":"none",human_timeout_seconds:30}];
+}
+function setExecutionState(state){executionState=state;badge("executionStatus",state,state.includes("ABORT")||state==="WAITING_FOR_HUMAN"?"warn":"good")}
+function setRunControls(active){for(const id of ["scenario","resetWorldBtn","generateBtn","validateBtn","pddlBtn","planBtn","runBtn","loadExampleBtn"])document.getElementById(id).disabled=active}
+function recordVersion(stage){
+ session.versions.push({version:missionRevision,stage,time:new Date().toISOString(),scenario:document.getElementById("scenario").value,world_version:worldVersion,execution_state:executionState,mission_spec:clone(missionSpec),validation:clone(validationResult),pddl:pddlProblem,robot_plan:clone(robotPlan),world:clone(world),state:clone(verifiedState),completed_goals:[...completedGoals]});
+ document.getElementById("versionHistory").textContent=`${missionRevision} mission version(s), ${session.versions.length} saved pipeline snapshots. Latest: ${stage}.`;
+}
+function applyScenario(){
+ if(running)return;
+ world=clone(worldDefaults);if(document.getElementById("scenario").value==="2")world.gateObstacle={id:"gate_blocker",type:"obstacle",x:555,y:155,w:90,h:80};
+ worldVersion++;verifiedState={version:0,observedAt:0,targetVisible:"UNKNOWN",targetLocalized:"UNKNOWN",gateClear:"UNKNOWN",holding:false,placed:false,atHome:true,inspectedViews:[],traversedGate:false,battery:Number(document.getElementById("battery").value)};
+ completedGoals=[];missionSpec=null;robotPlan=[];pddlProblem="";validationResult=null;document.getElementById("validateBtn").disabled=true;document.getElementById("specOut").textContent="Generate a mission specification for the selected scenario.";document.getElementById("pddlOut").textContent="PDDL problem not generated.";document.getElementById("planOut").textContent="Plan not generated.";document.getElementById("runBtn").disabled=true;document.getElementById("pddlBtn").disabled=true;document.getElementById("planBtn").disabled=true;badge("planBadge","REPLAN REQUIRED","warn");setExecutionState("IDLE");badge("worldVersionBadge","WORLD v"+worldVersion,"warn");refreshObservation("scenario selected");log(`Scenario ${document.getElementById("scenario").value} loaded; old plan invalidated.`,"warn");recordVersion("SCENARIO_CHANGED");updatePanels();
+}
+function isGoalCompleted(spec,g){return (spec.revision_context?.completed_goals||[]).includes(g.id)}
+function markCompleted(a){
+ const matches={SEARCH:g=>g.predicate==="found",INSPECT:g=>g.predicate==="inspected"&&JSON.stringify(g.args)===JSON.stringify(a.args),PICK:g=>g.predicate==="holding",TRAVERSE_GATE:g=>g.predicate==="traversed",PLACE:g=>g.predicate==="placed",RETURN_HOME:g=>g.predicate==="at"&&g.args[0]==="home",LAND:g=>g.predicate==="landed"};
+ for(const g of missionSpec.goals)if(matches[a.skill]?.(g)&&!completedGoals.includes(g.id))completedGoals.push(g.id);
+}
+function pddlInitialState(spec,O,G,P){
+ const c=spec.revision_context,st=c?.state,init=[`(at drone ${c&&!st.atHome?"current_loc":"home"})`,"(reachable home)","(reachable current_loc)","(reachable target_loc)","(reachable gate_loc)",`(reachable ${P})`,`(platform ${P})`,`(gate-at ${G} gate_loc)`];
+ if(st?.holding)init.push(`(holding drone ${O})`);else init.push("(gripper-empty drone)",`(object-at ${O} ${st?.placed?P:"target_loc"})`);
+ if(st?.placed)init.push(`(placed ${O} ${P})`);
+ if(st?.targetLocalized||st?.holding)init.push(`(found ${O})`,`(visible ${O})`,`(localized ${O})`);
+ for(const key of st?.inspectedViews||[]){const [obj,view]=JSON.parse(key);init.push(`(inspected ${sanitize(obj)} ${sanitize(view)})`)}
+ if(st?.traversedGate)init.push(`(traversed ${G})`);
+ if(computeGateClear())init.push(`(gate-clear ${G})`);
+ else if(!c)init.push(`; Optimistic gate-clear hypothesis: must be verified before execution.`,`(gate-clear ${G})`);
+ else init.push("; Gate observed blocked: no gate-clear fact asserted.");
+ if(c)init.push(`; current_loc corresponds to (${c.position.x.toFixed(1)}, ${c.position.y.toFixed(1)}), WORLD v${c.world_version}`);
+ return init;
+}
+function recoverySpec(original,decision,status){
+ const spec=clone(original),waived=[];
+ if(decision==="BYPASS_GATE"){
+   spec.goals=spec.goals.filter(g=>{if(g.predicate==="traversed"){waived.push(g.id);return false}return true});
+ }else{
+   waived.push(...spec.goals.filter(g=>!completedGoals.includes(g.id)).map(g=>g.id));
+   spec.goals=[decision==="LAND"?{id:"RECOVERY_LAND",predicate:"landed",args:["drone"],source:"SYSTEM_POLICY",source_text:"Safe landing after mission abort."}:{id:"RECOVERY_HOME",predicate:"at",args:["home"],source:"SYSTEM_POLICY",source_text:"Safe return after mission abort."}];
+   spec.assumptions=[];spec.unresolved=[];
+ }
+ spec.ordering=inferOrdering(spec.goals);spec.requested_capabilities=inferCapabilities(spec.goals);
+ spec.revision_context={decision,interrupt_id:status.id,parent_version:missionRevision,world_version:worldVersion,position:{x:world.drone.x,y:world.drone.y},state:clone(verifiedState),completed_goals:[...completedGoals],waived_goals:waived,reason:status.reason};
+ return spec;
+}
+function checkRecoveryMotion(spec,plan){
+ let current={x:world.drone.x,y:world.drone.y},length=0;
+ for(const a of plan){
+   let dest=null;
+   if(a.skill==="NAVIGATE")dest=resolveLocation(a.args[0]);
+   if(a.skill==="RETURN_HOME")dest=world.home;
+   if(a.skill==="PICK")dest=world.target;
+   if(a.skill==="PLACE")dest=world.platform;
+   if(a.skill==="SEARCH")dest={x:Math.max(60,world.target.x-190),y:Math.min(canvas.height-60,world.target.y+80)};
+   if(a.skill==="INSPECT"){const views=inspectionGoals(spec),i=views.findIndex(g=>JSON.stringify(g.args)===JSON.stringify(a.args)),angle=views.length===2?(i===0?Math.PI:Math.PI/2):Math.PI+i*2*Math.PI/views.length;dest={x:world.target.x+110*Math.cos(angle),y:world.target.y+110*Math.sin(angle)}}
+   if(a.skill==="TRAVERSE_GATE"&&!computeGateClear())throw new Error("Recovery still requires blocked gate.");
+   if(dest){if(dest.x<world.drone.r||dest.y<world.drone.r||dest.x>canvas.width-world.drone.r||dest.y>canvas.height-world.drone.r)throw new Error("Recovery destination outside geofence.");for(const point of planMotion(current,dest)){length+=dist(current,point);current=point}}
+ }
+ const moveCount=plan.filter(a=>["NAVIGATE","RETURN_HOME"].includes(a.skill)).length;
+ const energy=Math.max(length/90+plan.length,moveCount*4+plan.filter(a=>a.skill==="PLACE").length*2);
+ if(energy>Number(document.getElementById("battery").value))throw new Error("Recovery energy exceeds available battery.");
+ if(spec.revision_context.decision==="BYPASS_GATE"&&energy+SAFE_RETURN_RESERVE>Number(document.getElementById("battery").value))throw new Error("Bypass would consume safe-return reserve.");
+ return {energy,length};
+}
+async function requestHuman(status){
+ setExecutionState("WAITING_FOR_HUMAN");document.getElementById("humanPanel").hidden=false;log("Human approval requested; safe hover. Timeout: 30 seconds.","warn");
+ const decision=await new Promise(resolve=>{const timer=setTimeout(()=>finish("ABORT_AND_RETURN_HOME","timeout"),30000);function finish(action,reason){clearTimeout(timer);humanResolver=null;resolve({action,reason})}humanResolver=action=>finish(action,"human decision")});
+ document.getElementById("humanPanel").hidden=true;session.human_decisions.push({time:new Date().toISOString(),interrupt_id:status.id,...decision});log(`Human decision: ${decision.action} (${decision.reason}).`,"warn");return decision.action;
+}
+async function installRecovery(spec){
+ missionSpec=spec;missionRevision++;validationResult=null;pddlProblem="";robotPlan=[];recordVersion("REPLAN_SPEC");setExecutionState("VALIDATING_REPLAN");
+ const built=buildPlan(spec);if(!built.ok)throw new Error(built.reason);if(!built.plan.length&&verifiedState.atHome)markCompleted({skill:"RETURN_HOME",args:[]});
+ let geometry;try{geometry=checkRecoveryMotion(spec,built.plan)}catch(e){validationResult={status:"REJECTED",checks:[{name:"Recovery route and energy",status:"fail",detail:e.message}]};recordVersion("REPLAN_VALIDATION");throw e}
+ validationResult=validate(spec);
+ // Abort/landing spends the reserved battery to reach safety instead of reserving it again.
+ if(spec.revision_context.decision!=="BYPASS_GATE"){
+   validationResult.checks=validationResult.checks.filter(c=>c.name!=="V12 Energy reserve");validationResult.checks.push({name:"V12 Recovery energy",status:"pass",detail:`Verified recovery uses ${geometry.energy.toFixed(1)}%; battery ${verifiedState.battery}%.`});validationResult.status=validationResult.checks.some(c=>c.status==="fail")?"REJECTED":validationResult.checks.some(c=>c.status==="warn")?"NEEDS_CLARIFICATION":"ACCEPTED";
+ }
+ recordVersion("REPLAN_VALIDATION");renderValidation(validationResult);if(validationResult.status!=="ACCEPTED")throw new Error("Replacement mission did not pass validation.");
+ pddlProblem=compilePddl(spec);recordVersion("REPLAN_PDDL");robotPlan=built.plan;planWorldVersion=worldVersion;recordVersion("REPLAN_ROBOT_PLAN");
+ for(const [id,value] of [["specOut",JSON.stringify(spec,null,2)],["pddlOut",pddlProblem],["planOut",JSON.stringify({version:missionRevision,planned_against_world_version:planWorldVersion,plan:robotPlan},null,2)]])document.getElementById(id).textContent=value;
+ log(`Agent issued validated replacement plan v${missionRevision}: ${spec.revision_context.decision}; ${robotPlan.length} pending steps.`,"good");setExecutionState("EXECUTING");
+}
+async function handleInterrupt(action,reason){
+ setExecutionState("SAFE_PAUSE");refreshObservation("replan interrupt");
+ const status={id:"interrupt_"+(session.interrupts.length+1),time:new Date().toISOString(),mission_version:missionRevision,trigger:!computeGateClear()?"gate_not_clear":"runtime_failure",reason,failed_action:clone(action),position:{x:world.drone.x,y:world.drone.y},world_version:worldVersion,observations:clone(verifiedState),completed_goals:[...completedGoals],remaining_goals:missionSpec.goals.filter(g=>!completedGoals.includes(g.id)).map(g=>g.id)};
+ session.interrupts.push(status);log("Drone STATUS + REPLAN INTERRUPT: "+JSON.stringify(status),"warn");recordVersion("INTERRUPTED");setExecutionState("REPLAN_PENDING");
+ const original=clone(missionSpec),policy=original.contingencies?.find(c=>c.trigger===status.trigger);let decision=policy?.action||"ABORT_AND_RETURN_HOME";
+ if(Number(document.getElementById("battery").value)<=SAFE_RETURN_RESERVE)decision="ABORT_AND_RETURN_HOME";
+ if(decision==="ASK_HUMAN")decision=await requestHuman(status);
+ try{await installRecovery(recoverySpec(original,decision,status))}
+ catch(e){
+   log("Recovery rejected: "+e.message,"warn");
+   if(decision==="BYPASS_GATE"&&policy?.fallback==="ASK_HUMAN"){decision=await requestHuman(status);if(decision==="BYPASS_GATE"){try{await installRecovery(recoverySpec(original,decision,status));return}catch(error){log(error.message,"warn")}}}
+   if(decision!=="ABORT_AND_RETURN_HOME"){try{await installRecovery(recoverySpec(original,"ABORT_AND_RETURN_HOME",status));return}catch(error){log("Safe return unavailable: "+error.message,"warn")}}
+   // A failed safe-return route or insufficient return energy selects a local landing.
+   if(blocked(world.drone.x,world.drone.y))throw new Error("No safe recovery: drone is within obstacle clearance.");
+   await installRecovery(recoverySpec(original,"LAND",status));
+ }
+}
+document.getElementById("approveBypassBtn").onclick=()=>humanResolver?.("BYPASS_GATE");
+document.getElementById("abortMissionBtn").onclick=()=>humanResolver?.("ABORT_AND_RETURN_HOME");
+document.getElementById("saveSessionBtn").onclick=async()=>{
+ const button=document.getElementById("saveSessionBtn"),status=document.getElementById("saveStatus");button.disabled=true;
+ try{
+   if(location.protocol==="file:")throw new Error("Open this page through prototype_server.py to save into the project directory.");
+   const data={...clone(session),saved_at:new Date().toISOString(),scenario:document.getElementById("scenario").value,world:clone(world),state:clone(verifiedState)};
+   const response=await fetch("/api/save-session",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({directory:document.getElementById("saveDirectory").value.trim(),session:data})});
+   if([404,405,501].includes(response.status))throw new Error("This running server does not support saving sessions. Stop it with Ctrl+C and restart prototype_server.py from this project folder. Keep this page open without refreshing to preserve your logs, then click Save again.");
+   const result=await response.json();if(!response.ok)throw new Error(result.error||"Session save failed");status.textContent="Saved to "+result.path;log("Session saved to "+result.path,"good");
+ }catch(e){status.textContent=e.message;log(e.message,"bad")}finally{button.disabled=false}
+};
+
+updateMode();updatePanels();refreshObservation("initialization");log("Prototype initialized. Drag the world, compile a mission, validate, plan, and run.","good");requestAnimationFrame(draw);
+</script>
+</body>
+</html>

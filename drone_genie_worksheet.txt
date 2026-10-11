@@ -1,0 +1,292 @@
+AGENT: AccountableDroneAgent
+VERSION: 0.1
+STYLE: Genie-Worksheet-inspired declarative specification
+NOTE: This is a project-specific prototype DSL inspired by the Genie Worksheet idea.
+      It is not the literal Stanford Genie Worksheet syntax.
+
+============================================================
+1. PURPOSE
+============================================================
+The agent accepts a natural-language mission, compiles it into a constrained
+mission specification, validates it, generates a PDDL problem, produces a
+symbolic plan, and executes the plan through machine-verifiable skills.
+
+The language model may INTERPRET and PROPOSE.
+The deterministic runtime must VALIDATE and AUTHORIZE.
+
+============================================================
+2. ENTITY TYPES
+============================================================
+Drone
+PhysicalObject
+Location
+Region
+Viewpoint
+Gate
+Platform
+Obstacle
+
+============================================================
+3. VERIFIED WORLD-STATE PREDICATES
+============================================================
+found(object)
+visible(object)
+localized(object)
+inspected(object, viewpoint)
+holding(object)
+gripper_empty
+at(location)
+gate_clear(gate)
+reachable(location)
+traversed(gate)
+placed(object, location)
+inside_geofence
+obstacle_clear
+landed
+home(location)
+
+Numeric state:
+battery_percent
+estimated_return_energy
+obstacle_distance
+observation_age_ms
+
+Every decision-critical fact has:
+  value = TRUE | FALSE | UNKNOWN
+  provenance = sensor / VLM / geometry / policy / skill outcome
+  timestamp
+  verification_status = VERIFIED | OBSERVED | UNRESOLVED
+
+============================================================
+4. SUPPORTED SKILLS
+============================================================
+SEARCH(object)
+INSPECT(object, viewpoint)
+PICK(object)
+NAVIGATE(location)
+TRAVERSE_GATE(gate)
+PLACE(object, location)
+RETURN_HOME()
+HOVER()
+LAND()
+
+============================================================
+5. GLOBAL POLICIES
+============================================================
+P1 Geofence:
+   During execution, inside_geofence MUST remain TRUE.
+
+P2 Obstacle clearance:
+   During motion, obstacle_clear MUST remain TRUE.
+
+P3 Energy reserve:
+   Before a non-emergency skill:
+     predicted_battery_after_skill >= safe_return_reserve.
+
+P4 Unknown-state handling:
+   UNKNOWN does not satisfy a TRUE precondition.
+   A decision-critical UNKNOWN causes DEFER / NEEDS_CLARIFICATION / OBSERVE.
+
+P5 Capability grounding:
+   The planner may invoke only declared skills.
+
+P6 Vocabulary grounding:
+   The mission compiler may use only declared entity types, predicates,
+   policies, and skills.
+
+P7 Provenance:
+   Every generated mission goal and mission constraint must have one of:
+     USER
+     SYSTEM_POLICY
+     SKILL_CONTRACT
+     TASK_SEMANTICS
+     EXPLICIT_ASSUMPTION
+   USER-derived clauses must include the supporting user-text span.
+
+P8 No silent assumptions:
+   A requirement not directly supported by user text or a named policy
+   must be marked EXPLICIT_ASSUMPTION or UNRESOLVED.
+
+P9 Freshness:
+   A stale decision-critical observation invalidates the skill.
+
+P10 Runtime authority:
+   A previously approved skill may still be rejected/aborted by the
+   runtime verifier if the physical state changes.
+
+============================================================
+6. SKILL CONTRACTS
+============================================================
+
+SKILL SEARCH(object)
+ENTRY
+  battery_reserve_ok == TRUE
+SUCCESS
+  found(object) == TRUE
+  visible(object) == TRUE
+  localized(object) == TRUE
+FAILURE
+  search_timeout
+  battery_reserve_violation
+FALLBACK
+  HOVER
+
+SKILL INSPECT(object, viewpoint)
+ENTRY
+  visible(object) == TRUE
+  localized(object) == TRUE
+  reachable(viewpoint) == TRUE
+  observation_age_ms <= 500
+  battery_reserve_ok == TRUE
+INVARIANTS
+  inside_geofence == TRUE
+  obstacle_clear == TRUE
+SUCCESS
+  inspected(object, viewpoint) == TRUE
+  target_visible_in_evidence == TRUE
+  image_quality_ok == TRUE
+FAILURE
+  target_lost
+  obstacle_violation
+  stale_state
+  timeout
+FALLBACK
+  HOVER
+
+SKILL PICK(object)
+ENTRY
+  visible(object) == TRUE
+  localized(object) == TRUE
+  gripper_empty == TRUE
+  reachable(object) == TRUE
+  battery_reserve_ok == TRUE
+INVARIANTS
+  inside_geofence == TRUE
+  obstacle_clear == TRUE
+SUCCESS
+  holding(object) == TRUE
+COMPLETION EVIDENCE
+  gripper_closed == TRUE
+  payload_detected == TRUE
+FAILURE
+  target_lost
+  grasp_timeout
+  obstacle_violation
+FALLBACK
+  retreat_to_safe_pose
+  HOVER
+
+SKILL NAVIGATE(location)
+ENTRY
+  reachable(location) == TRUE
+  battery_reserve_ok == TRUE
+INVARIANTS
+  inside_geofence == TRUE
+  obstacle_clear == TRUE
+SUCCESS
+  at(location) == TRUE
+FAILURE
+  no_safe_path
+  obstacle_violation
+  stale_state
+  timeout
+FALLBACK
+  HOVER
+
+SKILL TRAVERSE_GATE(gate)
+ENTRY
+  gate_clear(gate) == TRUE
+  battery_reserve_ok == TRUE
+INVARIANTS
+  inside_geofence == TRUE
+  obstacle_clear == TRUE
+SUCCESS
+  traversed(gate) == TRUE
+FAILURE
+  gate_clear(gate) becomes FALSE or UNKNOWN
+  obstacle_violation
+  timeout
+FALLBACK
+  stop_before_gate
+  HOVER
+
+SKILL PLACE(object, location)
+ENTRY
+  holding(object) == TRUE
+  at(location) == TRUE
+  battery_reserve_ok == TRUE
+SUCCESS
+  placed(object, location) == TRUE
+  holding(object) == FALSE
+  gripper_empty == TRUE
+FAILURE
+  placement_timeout
+  object_drop
+  obstacle_violation
+FALLBACK
+  HOVER
+
+SKILL RETURN_HOME()
+ENTRY
+  home(home_location) == TRUE
+  reachable(home_location) == TRUE
+INVARIANTS
+  inside_geofence == TRUE
+  obstacle_clear == TRUE
+SUCCESS
+  at(home_location) == TRUE
+FAILURE
+  no_safe_path
+  obstacle_violation
+FALLBACK
+  LAND at safe location when return is no longer feasible
+
+============================================================
+7. MISSION-SPEC VALIDATION
+============================================================
+ACCEPT only if:
+  V1  schema shape is valid
+  V2  entity types are known
+  V3  predicates are known
+  V4  requested capabilities are supported
+  V5  goals/constraints have valid provenance
+  V6  no unsupported hidden assumptions are present
+  V7  no decision-critical ambiguity remains unresolved
+  V8  goals are logically consistent
+  V9  ordering constraints are acyclic
+  V10 mission compiles into fixed PDDL domain
+  V11 a symbolic plan is reachable
+  V12 estimated mission energy preserves safe-return reserve
+
+Status:
+  ACCEPTED
+  NEEDS_CLARIFICATION
+  REJECTED
+
+============================================================
+8. RUNTIME LOOP
+============================================================
+before_skill:
+  check mission-plan authorization
+  check skill entry conditions
+  check state freshness
+  check energy reserve
+
+while_skill:
+  monitor invariants
+  abort on changed decision-critical state
+
+after_skill:
+  verify postconditions
+  update VERIFIED WORLD STATE only from verified evidence
+
+on_reject_or_abort:
+  report decision, evidence, failed condition, unresolved facts,
+  and pivotal/corrective condition; then request replan.
+
+============================================================
+9. ACCOUNTABILITY PRINCIPLE
+============================================================
+LLM/VLM output is a proposal or observation claim, not ground truth.
+A generated formal specification is checkable, not automatically correct.
+Unsupported interpretations must not silently become executable behavior.

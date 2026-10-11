@@ -1,0 +1,24 @@
+animate=async function(dest){if(motionBlocked(world.drone,dest))throw new Error("unsafe animation");world.drone.x=dest.x;world.drone.y=dest.y;if(verifiedState.holding){world.target.x=dest.x+24;world.target.y=dest.y+20}};
+sleep=async()=>{};
+function assert(condition,message){if(!condition)throw new Error(message)}
+async function prepare(scenario,clause=""){
+ element("battery").value="92";element("scenario").value=scenario;applyScenario();
+ const text=values.mission+clause;element("mission").value=text;
+ await element("generateBtn").onclick();element("validateBtn").onclick();assert(validationResult.status==="ACCEPTED","initial validation failed "+JSON.stringify(validationResult));element("planBtn").onclick();assert(robotPlan.some(a=>a.skill==="TRAVERSE_GATE"),"Initial plan is not optimistic");
+}
+async function tests(){
+ await prepare("1");await executePlan();assert(session.outcome==="MISSION_COMPLETED","Scenario 1 failed "+session.outcome);assert(verifiedState.inspectedViews.length===3,"Lost third inspection");assert(verifiedState.placed&&verifiedState.atHome,"Delivery/home missing");
+ await prepare("2");assert(!computeGateClear(),"Scenario 2 gate clear");await executePlan();assert(session.outcome==="MISSION_ABORTED_SAFE_RETURN_COMPLETED","Default recovery failed: "+session.outcome);assert(verifiedState.atHome&&verifiedState.holding&&!verifiedState.placed,"Abort lost package or delivered unexpectedly");assert(robotPlan.length===1&&robotPlan[0].skill==="RETURN_HOME","Abort plan repeats work");assert(pddlProblem.includes("(holding drone red_package)")&&pddlProblem.includes("(at drone current_loc)"),"Recovery PDDL not current state");assert(pddlProblem.includes("view_c - viewpoint"),"Recovered facts refer to undeclared views");
+ await prepare("2"," If the gate is not clear, bypass or ask for human feedback.");await executePlan();assert(session.outcome==="MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS","Bypass failed "+session.outcome);assert(verifiedState.placed&&verifiedState.atHome&&!verifiedState.traversedGate,"Bypass outcome incorrect");assert(robotPlan.every(a=>!["SEARCH","INSPECT","PICK","TRAVERSE_GATE"].includes(a.skill)),"Bypass repeated completed steps");
+ await prepare("2"," If the gate is blocked, ask me before bypassing.");const run=executePlan();for(let i=0;i<100&&!humanResolver;i++)await Promise.resolve();assert(humanResolver,"Human decision not requested");assert(executionState==="WAITING_FOR_HUMAN","Wrong waiting state");humanResolver("BYPASS_GATE");await run;assert(session.outcome==="MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS","Human bypass failed");
+ await prepare("2"," If the gate is blocked, ask for human feedback.");const pending=executePlan();for(let i=0;i<100&&!humanResolver;i++)await Promise.resolve();assert(timeoutCallback,"No timeout");timeoutCallback();await pending;assert(session.outcome==="MISSION_ABORTED_SAFE_RETURN_COMPLETED","Timeout did not return home");
+ await prepare("2"," If the gate is blocked, ask for human feedback.");const decline=executePlan();for(let i=0;i<100&&!humanResolver;i++)await Promise.resolve();assert(humanResolver,"No human choice");humanResolver("ABORT_AND_RETURN_HOME");await decline;assert(session.outcome==="MISSION_ABORTED_SAFE_RETURN_COMPLETED","Human abort failed");
+ await prepare("2");world.home.x=555;world.home.y=155;await executePlan();assert(session.outcome==="MISSION_ABORTED_SAFE_LANDING_COMPLETED","Unreachable home should land safely: "+session.outcome);
+ await prepare("2");element("battery").value="15";await executePlan();assert(session.outcome==="MISSION_ABORTED_SAFE_RETURN_COMPLETED","Already home low battery recovery failed: "+session.outcome);
+ assert(session.versions.some(v=>v.stage==="REPLAN_VALIDATION")&&session.versions.some(v=>v.stage==="REPLAN_PDDL"),"Recovery artifacts missing");assert(session.interrupts.length>=4,"Interrupts missing");
+ let saved;fetch=async(url,options)=>{saved=JSON.parse(options.body);return{ok:true,json:async()=>({path:"session_logs/test"})}};
+ await element("saveSessionBtn").onclick();assert(saved.session.versions.length===session.versions.length,"Export lost history");assert(!JSON.stringify(saved).includes('"apiKey"'),"Export contains credentials");
+ const count=session.versions.length;fetch=async()=>({ok:false,status:404});await element("saveSessionBtn").onclick();assert(element("saveStatus").textContent.includes("restart prototype_server.py"),"Old server diagnostic missing");assert(session.versions.length===count,"Failed save lost logs");
+ print("PASS: clear scenario, blocked default return, authorized bypass, human approval, human timeout, current-state PDDL, completed milestones, version history and export.");
+}
+tests().catch(e=>{printerr(e.stack);printerr(session.events.slice(-12).map(e=>e.message).join("\n"));imports.system.exit(1)});
