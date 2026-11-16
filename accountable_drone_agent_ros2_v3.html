@@ -24,6 +24,7 @@ label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5
 @media(max-width:1100px){.grid{grid-template-columns:1fr}.sim-wrap{grid-template-columns:1fr}.row{grid-template-columns:1fr}}
 #externalControls[hidden],#clarificationPanel[hidden]{display:none}
 </style>
+<link rel="stylesheet" href="ros2_sim/chat.css"/>
 </head>
 <body>
 <header><h1>Drone Agent — ROS 2 / Gazebo Edition</h1><p>Natural language → constrained mission spec → validation → Behavior Tree → verified simulation · optional PDDL export</p></header>
@@ -50,7 +51,7 @@ label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5
 <div><label>Mission goal</label><textarea id="mission">Find the red package, inspect it from two viewpoints, pick it up, fly through the gate, place it on the blue platform, and return home.</textarea></div>
 <div id="gatePolicySummary" class="note" hidden></div>
 <div class="row"><button class="btn primary" id="generateBtn">Generate Mission Spec</button><button class="btn" id="loadExampleBtn">Load Another Example</button></div>
-<div class="note">The LLM only compiles intent into the constrained schema. It does <b>not</b> authorize execution or generate motor commands. For external execution, use the launcher in <code>ros2_sim</code>; its server also provides the local LLM proxy.</div>
+<div class="note">The LLM proposes the Mission Spec and Behavior Tree. It does <b>not</b> authorize execution or generate motor commands. For external execution, use the launcher in <code>ros2_sim</code>; its server also provides the local LLM proxy.</div>
 </div></section>
 
 <section class="panel"><div class="panel-head"><h2>2. Mission Validation</h2><span class="badge" id="validationBadge">NOT RUN</span></div><div class="panel-body stack">
@@ -69,6 +70,11 @@ label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5
 </div>
 
 <div class="stack">
+<section class="panel mission-chat" aria-label="Mission conversation">
+<div class="panel-head"><h2>Mission conversation</h2><span id="chatContext" class="chat-context">Ready for a mission</span></div>
+<div id="chatThread" class="chat-thread" role="log" aria-label="Mission messages" aria-live="polite" aria-relevant="additions"></div>
+<div class="chat-compose"><label for="chatInput">Message the mission agent</label><textarea id="chatInput" rows="2" placeholder="Describe a mission, clarify an assumption, or ask for status…"></textarea><div class="toolbar"><span id="chatHint" class="small">Review assumptions, resolve issues, and follow verified milestones.</span><button id="chatStatusBtn" class="btn">Status</button><button id="chatSendBtn" class="btn primary">Send</button></div></div>
+</section>
 <section class="panel">
 <div class="pipeline"><div class="pipe active" id="pipeMission">Mission</div><div class="pipe" id="pipeSpec">Spec</div><div class="pipe" id="pipeValidate">Validate</div><div class="pipe" id="pipePlan">Behavior Tree</div><div class="pipe" id="pipeExecute">Execute</div></div>
 <div class="panel-head"><h2>4. Drone Simulation</h2><div class="toolbar"><span class="badge" id="worldVersionBadge">WORLD v1</span><button class="btn" id="modeBtn">Mode: EDIT</button><button class="btn" id="observeBtn">Refresh Observation</button><button class="btn warn" id="resetWorldBtn">Reset World</button></div></div>
@@ -143,8 +149,8 @@ Entity types: drone, object, location, region, viewpoint, gate, platform, obstac
 Every USER goal needs exact source_text. Do not silently invent requirements; put ambiguity in unresolved[].
 If user requests unsupported behavior, include a short uppercase name in requested_capabilities.
 Use red_package, blue_platform, red_platform, gate_1, home, view_a, view_b when corresponding entities appear.
-For N requested viewpoints, create exactly N inspected goals with distinct viewpoint IDs (view_a, view_b, view_c, etc.) and matching viewpoint entities. For multiple viewpoints include a SYSTEM_POLICY constraint minimum_view_separation_deg=30. Never reduce the requested viewpoint count.
-Constraint params must contain degrees: use 30 for minimum_view_separation_deg, or null when degrees does not apply. Put constraints requiring unsupported parameters in unresolved[] rather than inventing parameter fields.
+For N requested viewpoints, create exactly N inspected goals with distinct viewpoint IDs (view_a, view_b, view_c, etc.) and matching viewpoint entities. For multiple viewpoints, preserve an explicitly requested minimum separation angle as a USER constraint minimum_view_separation_deg. When no angle is specified, propose 30 degrees as an EXPLICIT_ASSUMPTION constraint; the UI will ask the user to review it. Never reduce the requested viewpoint count.
+Constraint params must contain degrees: use the requested angle or the proposed default 30 for minimum_view_separation_deg, or null when degrees does not apply. Put constraints requiring unsupported parameters in unresolved[] rather than inventing parameter fields.
 If user says return/home, use at(home). If placement/delivery, capabilities include PICK and PLACE.
 If fly through/traverse gate, include traversed(gate_1). Ordering must reflect task semantics.
 
@@ -989,6 +995,7 @@ document.getElementById("saveSessionBtn").onclick=async()=>{
 
 updateMode();updatePanels();refreshObservation("initialization");log("Browser build: bt-gate-policy-v3. Drag the world, compile a mission, validate, plan, and run.","good");requestAnimationFrame(draw);
 </script>
+<script src="ros2_sim/chat.js"></script>
 <script src="ros2_sim/app.js"></script>
 </body>
 </html>

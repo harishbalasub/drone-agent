@@ -281,3 +281,17 @@ With an API key, mission compilation and behavior-tree generation are separate L
 Without a key, the explicitly enabled local demo uses scripted compilation and planning. API failures do not silently select demo planning. Refresh the v3 page and regenerate the spec and plan to use the new flow. Restart the gateway for Python executor changes. Tests include mocked provider proposals with a non-template topology, blue delivery with a clear gate and red delivery when blocked; these are not live provider or physical Gazebo validation.
 
 PDDL export is optional. After validating the Mission Spec, select **Generate Behavior Tree** directly. **Generate PDDL (optional)** creates a separate export only when requested. Validation, tree generation, alternate selection and recovery do not invoke the PDDL compiler. An export failure does not invalidate the Behavior Tree.
+
+### Mission conversation
+
+The v3 page now includes a conversation alongside the scene and technical panels:
+
+- Review assumptions introduced by the compiler, including proposed inspection separation. Accept individual assumptions or edit the angle; edits invalidate the previous tree and revalidate the spec.
+- Validation cards show failures and energy/reserve estimates. External battery is explicitly unavailable unless supplied by telemetry; browser estimates do not certify external endurance.
+- Submit a new mission or an incremental edit. With a provider key, an LLM maps the turn to a proposed complete mission; **Apply and validate** is required before mutation. Without a key, chat can accept a complete replacement mission through the explicit local demo path.
+- Milestone cards report successful search, inspections, pickup, gate traversal, placement, return and final outcome. Camera thumbnails supplement controller evidence; they do not establish success. Browser views are schematic renderings, not ROS camera images.
+- For ROS2, the gateway captures the latest preceding forward/down frames at each event, with frame age and estimated UTC capture time. Frames older than 1.5 seconds are labeled stale and omitted. Pillow provides bounded JPEG thumbnails; if unavailable, the card reports that rather than substituting a live image. Restart the gateway to enable capture.
+- The chat mirrors existing human bypass/abort decisions and controller timeouts. Arbitrary mission changes during execution remain blocked; dynamic LLM replanning is not introduced by this interface.
+- Cards are tied to mission state; stale decisions cannot update a revised mission. Chat and image audit records are included in saved session events. No keys are added to chat context or saved records.
+
+Validation includes mocked structured chat responses, stale decisions, assumption confirmation, angle changes, insufficient battery, completed milestones, world reset/plan reuse, and stale/missing camera evidence. Live LLM-provider and physical Gazebo runs require separate verification.

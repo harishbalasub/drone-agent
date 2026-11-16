@@ -70,11 +70,11 @@
   async function refresh(){
     if(polling)return;polling=true;
     try{
-      latest=await api('state');summary(latest);
+      latest=await api('state');summary(latest);globalThis.DroneChat?.externalState(latest);
       if(external()&&latest.active&&!externalRun){externalRun=latest.run_id;lastSequence=0;running=true;setRunControls(true);el('executionBackend').disabled=true;setExecutionState('EXTERNAL_EXECUTION');}
       if(externalRun&&latest.run_id===externalRun){
         for(const e of latest.session?.events||[])if(e.sequence>lastSequence){
-          lastSequence=e.sequence;log(`[${latest.transport}] ${e.message_type}: ${e.reason||e.outcome||(e.message_type==='BT_NODE'?e.node_path+' '+e.status:e.message_type==='BT_ALTERNATE_SELECTED'?e.trigger+' → '+e.action+'; waived: '+e.waived_goals.join(', '):e.action?.skill||e.result||'')}`,e.result==='FAILED'?'warn':'');
+          lastSequence=e.sequence;globalThis.DroneChat?.externalEvent(e,latest);log(`[${latest.transport}] ${e.message_type}: ${e.reason||e.outcome||(e.message_type==='BT_NODE'?e.node_path+' '+e.status:e.message_type==='BT_ALTERNATE_SELECTED'?e.trigger+' → '+e.action+'; waived: '+e.waived_goals.join(', '):e.action?.skill||e.result||'')}`,e.result==='FAILED'?'warn':'');
         }
         if(!latest.active){
           log('External outcome: '+latest.status,latest.status==='MISSION_COMPLETED'?'good':'warn');
@@ -100,7 +100,7 @@
     }catch(e){log(e.message,'bad');}
   };
   el('externalStop').onclick=async()=>{try{await api('stop',{});await refresh();}catch(e){log(e.message,'bad');}};
-  async function saveExternal(){try{const r=await api('save',{directory:el('saveDirectory').value});el('saveStatus').textContent='Saved '+r.path;log('External session saved: '+r.path,'good');}catch(e){log(e.message,'bad');}}
+  async function saveExternal(){try{const r=await api('save',{directory:el('saveDirectory').value,ui_events:session.events.filter(e=>e.message_type?.startsWith('CHAT_'))});el('saveStatus').textContent='Saved '+r.path;log('External session saved: '+r.path,'good');}catch(e){log(e.message,'bad');}}
   el('externalSave').onclick=saveExternal;
   el('saveSessionBtn').onclick=()=>external()?saveExternal():browserSave();
   for(const [id,action] of [['externalBypass','BYPASS_GATE'],['externalAbort','ABORT_AND_RETURN_HOME']])el(id).onclick=async()=>{try{await api('decision',{action});await refresh();}catch(e){log(e.message,'bad');}};

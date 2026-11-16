@@ -2,6 +2,8 @@
 from drone_sim.runtime_status import contract_status
 from drone_sim.behavior_tree import build_tree, nominal_actions, execute_tree, validate_generated_tree
 import copy
+import base64
+import io
 import heapq
 import json
 import math
@@ -135,7 +137,33 @@ class Executor:
                 else:self.transport.velocity([0,0,0])
             time.sleep(.1)
 
+    def camera_evidence(self):
+        """Capture latest *past* frames at a milestone; never substitute live URLs."""
+        frames=[];now=time.monotonic();wall=time.time()
+        with self.transport.lock:
+            camera_state=copy.deepcopy(self.transport.state.get('cameras',{}))
+            images={c:self.transport.images.get(c) for c in ['front','down']}
+        for camera in ['front','down']:
+            meta=camera_state.get(camera,{})
+            frame={'camera':camera,'label':('Gazebo ' if self.transport.kind=='gazebo_native' else 'ROS2 ')+('forward' if camera=='front' else 'downward')+' camera','source':'event_time_'+self.transport.kind+'_camera'}
+            received=meta.get('received',0);age=now-received if received else None
+            if age is not None:
+                frame.update(age_seconds=round(age,3),captured_at=datetime.fromtimestamp(wall-age,timezone.utc).isoformat())
+            if not images[camera]:frame['reason']='No camera frame received'
+            elif age is None or age<0 or age>1.5:frame['reason']='Camera frame is stale; not shown as current evidence'
+            else:
+                try:
+                    from PIL import Image
+                    image=Image.open(io.BytesIO(images[camera]));image.thumbnail((240,160));out=io.BytesIO();image.convert('RGB').save(out,format='JPEG',quality=65)
+                    frame['data_url']='data:image/jpeg;base64,'+base64.b64encode(out.getvalue()).decode('ascii')
+                except ImportError:frame['reason']='Thumbnail encoder unavailable (Pillow); live camera remains available'
+                except Exception:frame['reason']='Camera frame could not be decoded'
+            frames.append(frame)
+        return frames
+
     def event(self,kind,**data):
+        if kind=='MISSION_RESULT' or kind=='ACTION_RESULT' and data.get('result')=='SUCCEEDED' and data.get('action',{}).get('skill') in {'SEARCH','INSPECT','PICK','TRAVERSE_GATE','PLACE','RETURN_HOME'}:
+            data['camera_evidence']=self.camera_evidence()
         e={'schema_version':'1.0','message_type':kind,'run_id':self.run_id,'mission_revision':getattr(self,'revision',0),'time':utc(),**data}
         with self.lock:
             if self.session is not None:

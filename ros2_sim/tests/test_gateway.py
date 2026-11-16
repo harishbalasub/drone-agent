@@ -31,6 +31,19 @@ class HTTPContracts(unittest.TestCase):
             with urllib.request.urlopen(self.base+'/'+page) as r:self.assertEqual(r.status,200);r.read()
     def test_state_reports_disconnected(self):
         with urllib.request.urlopen(self.base+'/api/sim/state') as r:self.assertFalse(json.load(r)['connected'])
+    def test_external_save_includes_chat_audit(self):
+        from unittest.mock import patch
+        from drone_sim.mission import ROOT
+        previous=self.ex.session
+        self.ex.session={'session_id':'chat-test','started_at':'test','events':[{'message_type':'MISSION_RESULT'}],'versions':[],'interrupts':[],'human_decisions':[],'outcome':'TEST','metrics':{}}
+        chat={'message_type':'CHAT_MESSAGE','text':'Mission needs review','frames':[]}
+        try:
+            with patch('server.save_session',return_value=ROOT/'session_logs/test') as save:
+                req=urllib.request.Request(self.base+'/api/sim/save',data=json.dumps({'directory':'session_logs/test','ui_events':[chat]}).encode(),headers={'Content-Type':'application/json'})
+                with urllib.request.urlopen(req) as response:self.assertEqual(response.status,200)
+                self.assertEqual(save.call_args.args[1]['events'][-1],chat)
+        finally:self.ex.session=previous
+
     def test_no_fake_camera(self):
         with self.assertRaises(urllib.error.HTTPError) as e:urllib.request.urlopen(self.base+'/api/sim/camera/front')
         self.assertEqual(e.exception.code,404)

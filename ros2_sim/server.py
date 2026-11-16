@@ -39,7 +39,8 @@ def make_handler(executor):
                 self._json(403,{'error':'Use the app served by this gateway'});return
             try:
                 n=int(self.headers.get('Content-Length','0'))
-                if not 0<n<=500000:raise ValueError('Request must contain 1–500000 bytes')
+                limit=10_000_000 if path=='/api/sim/save' else 500000
+                if not 0<n<=limit:raise ValueError('Request body exceeds endpoint size limit')
                 req=json.loads(self.rfile.read(n))
                 if path=='/api/sim/run': result=executor.start(req)
                 elif path=='/api/sim/stop': result=executor.cancel()
@@ -49,6 +50,9 @@ def make_handler(executor):
                     if not session:raise ValueError('No simulation session to save')
                     # Existing safe save utility filters credentials and bounds output to project.
                     artifact={k:session[k] for k in ['session_id','started_at','events','versions','interrupts','human_decisions','outcome']}
+                    ui_events=req.get('ui_events',[])
+                    if not isinstance(ui_events,list) or any(not isinstance(e,dict) or not str(e.get('message_type','')).startswith('CHAT_') for e in ui_events):raise ValueError('Invalid chat audit events')
+                    artifact['events']=[*session['events'],*ui_events]
                     artifact['state']={'facts':state['facts'],'sensors':state['sensors'],'metrics':session['metrics'],'backend':state['transport']}
                     folder=save_session(req.get('directory','session_logs/ros2'),artifact)
                     result={'path':str(folder.relative_to(ROOT))}
