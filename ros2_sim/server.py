@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import signal
 import sys
 from http.server import ThreadingHTTPServer
 from pathlib import Path
@@ -12,6 +13,7 @@ ROOT=Path(__file__).resolve().parent.parent
 sys.path.insert(0,str(ROOT))
 from prototype_server import Handler, save_session
 from drone_sim.mission import Executor
+from drone_sim.startup import check_port
 
 
 def make_handler(executor):
@@ -64,8 +66,10 @@ def make_handler(executor):
 
 
 def main():
-    parser=argparse.ArgumentParser();parser.add_argument('--transport',choices=['ros2','gazebo'],default='ros2');parser.add_argument('--port',type=int,default=8100);parser.add_argument('--config');parser.add_argument('--host',default=os.environ.get('DRONE_BIND_HOST','127.0.0.1'))
+    parser=argparse.ArgumentParser();parser.add_argument('--transport',choices=['ros2','gazebo'],default='ros2');parser.add_argument('--port',type=int,default=os.environ.get('DRONE_PORT','8100'));parser.add_argument('--config');parser.add_argument('--host',default=os.environ.get('DRONE_BIND_HOST','127.0.0.1'))
     args=parser.parse_args()
+    try:check_port(args.host,args.port)
+    except ValueError as error:raise SystemExit(str(error))
     try:
         if args.transport=='ros2':
             from drone_sim.transport import RosTransport
@@ -76,8 +80,15 @@ def main():
     except ImportError as e:
         raise SystemExit(f'Missing simulator dependency: {e}. Source ROS 2 Humble and install the dependencies in ros2_sim/README.md. No simulated success or automatic transport fallback is used.')
     config=json.loads(Path(args.config).read_text()) if args.config else None
-    executor=Executor(transport,config);server=ThreadingHTTPServer((args.host,args.port),make_handler(executor))
+    executor=Executor(transport,config)
+    try:server=ThreadingHTTPServer((args.host,args.port),make_handler(executor))
+    except OSError as error:
+        executor.close()
+        raise SystemExit(f'Gateway could not bind {args.host}:{args.port}: {error}. Stop the older gateway or set DRONE_PORT to a free port.') from None
     print(f'App: http://{args.host}:{args.port}/accountable_drone_agent_ros2_v3.html (transport={transport.kind})',flush=True)
+    def stop_gateway(signum,frame):raise KeyboardInterrupt
+    # rclpy installs its own handlers; shutdown must also stop the HTTP loop.
+    signal.signal(signal.SIGTERM,stop_gateway);signal.signal(signal.SIGINT,stop_gateway)
     try:server.serve_forever()
     except KeyboardInterrupt:pass
     finally:server.server_close();executor.close()

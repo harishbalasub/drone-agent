@@ -295,3 +295,9 @@ The v3 page now includes a conversation alongside the scene and technical panels
 - Cards are tied to mission state; stale decisions cannot update a revised mission. Chat and image audit records are included in saved session events. No keys are added to chat context or saved records.
 
 Validation includes mocked structured chat responses, stale decisions, assumption confirmation, angle changes, insufficient battery, completed milestones, world reset/plan reuse, and stale/missing camera evidence. Live LLM-provider and physical Gazebo runs require separate verification.
+
+### Gateway port conflicts
+
+The launcher checks its HTTP address before starting Gazebo or the bridges. If an older gateway owns the address, stop its launcher with Ctrl+C before restarting. The launcher never automatically kills an existing listener. The default address is `127.0.0.1:8100`; `DRONE_BIND_HOST` and `DRONE_PORT` configure the address.
+
+For example, `DRONE_PORT=8101 bash ros2_sim/scripts/launch.sh 1 --render-headless --rgbd` serves the app on port 8101. Parallel simulations also require different `ROS_DOMAIN_ID` and `GZ_PARTITION` values; changing the HTTP port alone does not isolate robot topics. Gateway SIGINT/SIGTERM now closes the HTTP server, and launcher cleanup has a bounded shutdown period for rendering children.
