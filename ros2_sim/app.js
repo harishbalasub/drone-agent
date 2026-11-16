@@ -27,8 +27,10 @@
     el('simConnection').className='badge '+(s.connected?'good':'warn');
     el('externalStatus').textContent=JSON.stringify({status:s.status,transport:s.transport,pose_age_seconds:s.pose_age_seconds,facts:s.facts,sensors:s.sensors},null,2);
     el('externalHuman').hidden=s.status!=='WAITING_FOR_HUMAN';
-    if(external())for(const id of ['scenario','resetWorldBtn','modeBtn','observeBtn','battery'])el(id).disabled=true;
+    if(external())for(const id of ['scenario','modeBtn','observeBtn','battery'])el(id).disabled=true;
     if(external()){
+      el('resetWorldBtn').disabled=!s.reset_supported||s.active||running||s.status==='RESETTING';
+      el('resetWorldBtn').title=s.reset_supported?'Reset the Gazebo world; keep the original Robot Plan':'Restart the gateway to enable external world reset';
       setExecutionState(s.status);
       const contract=s.runtime_contract;
       if(contract){
@@ -78,7 +80,7 @@
         }
         if(!latest.active){
           log('External outcome: '+latest.status,latest.status==='MISSION_COMPLETED'?'good':'warn');
-          session.outcome=latest.status;setExecutionState(latest.status);externalRun=null;running=false;setRunControls(false);el('executionBackend').disabled=false;el('runBtn').disabled=true;for(const id of ['scenario','resetWorldBtn','modeBtn','observeBtn','battery'])el(id).disabled=true;
+          session.outcome=latest.status;setExecutionState(latest.status);externalRun=null;running=false;setRunControls(false);el('executionBackend').disabled=false;el('runBtn').disabled=true;for(const id of ['scenario','modeBtn','observeBtn','battery'])el(id).disabled=true;
         }
       }
     }catch(e){el('simConnection').textContent='GATEWAY UNAVAILABLE';if(external()){el('contractPanel').textContent='Gateway unavailable — live runtime checks unavailable.';el('batteryValue').textContent='Unavailable';el('batteryNote').textContent=' — gateway disconnected';}
@@ -110,7 +112,24 @@
   }
   el('observeBtn').onclick=()=>external()?refresh():browserObserve();
   el('scenario').onchange=()=>{if(!external())browserScenario();};
-  el('resetWorldBtn').onclick=()=>{if(!external())browserReset();};
+  el('resetWorldBtn').onclick=async()=>{
+    if(!external())return browserReset();
+    if(running||latest?.active){log('Stop the mission before resetting Gazebo.','warn');return;}
+    running=true;setExecutionState('RESETTING');setRunControls(true);el('executionBackend').disabled=true;
+    try{
+      const result=await api('reset',{ui_events:session.events.filter(e=>e.message_type?.startsWith('CHAT_'))});
+      externalRun=null;lastSequence=0;shownRevision='';completedGoals=[];stopRequested=false;worldVersion++;
+      verifiedState={version:0,observedAt:0,targetVisible:'UNKNOWN',targetLocalized:'UNKNOWN',gateClear:'UNKNOWN',holding:false,placed:false,atHome:false,inspectedViews:[],traversedGate:false,battery:null};
+      session.outcome='NOT_STARTED';running=false;setExecutionState('IDLE');setRunControls(false);
+      if(reusablePlan)restoreReusablePlan(reusablePlan);else{el('runBtn').disabled=true;el('validateBtn').disabled=!missionSpec;for(const id of ['pddlBtn','planBtn'])el(id).disabled=validationResult?.status!=='ACCEPTED';}
+      badge('worldVersionBadge','WORLD v'+worldVersion,'good');
+      recordVersion('EXTERNAL_WORLD_RESET');
+      globalThis.DroneChat?.card('Gazebo world reset',reusablePlan?'Initial drone and package positions verified. The original Robot Plan is ready to run again.':'Initial drone and package positions verified. Generate a mission to begin.',{evidence:result});
+      log('Gazebo reset verified; '+(result.saved_session?'previous episode saved to '+result.saved_session:'no previous episode')+'.','good');
+      await refresh();
+    }catch(e){running=false;setRunControls(false);el('runBtn').disabled=true;log('Gazebo reset failed: '+e.message,'bad');globalThis.DroneChat?.card('World reset failed',e.message,{kind:'problem'});}
+    finally{el('executionBackend').disabled=false;}
+  };
   const referenceDraw=draw;draw=()=>{referenceDraw();if(external()){ctx.fillStyle='#f8fbff';ctx.fillRect(0,0,canvas.width,26);ctx.fillStyle='#315b85';ctx.font='12px sans-serif';ctx.fillText('External telemetry projection · altitude '+(latest?.sensors?.position?.[2]?.toFixed(2)||'?')+' m · Gazebo is authoritative',12,18);}};
   viewMode();
   setInterval(()=>{if(external()||externalRun)refresh();},1000);

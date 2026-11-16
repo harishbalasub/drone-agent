@@ -41,6 +41,12 @@ class Sensors:
         self.images={}
         self.learned_package=os.environ.get("DRONE_PACKAGE_PERCEPTION")=="rgbd"
 
+    def clear_observations(self):
+        with self.lock:
+            self.state.clear()
+            self.state.update(position=None,velocity=[0,0,0],yaw=0.,pose_received=0.,objects={},gripper='unknown',gripper_received=0.,contacts=[],contact_received=0.,imu_received=0.,cameras={},semantic_received={},depth=None,sequence=0)
+            self.images.clear()
+
     def snapshot(self):
         with self.lock: return copy.deepcopy(self.state)
 
@@ -137,6 +143,10 @@ class Sensors:
 
 class GazeboTransport(Sensors):
     kind='gazebo_native'
+    def reset_world(self):
+        from drone_sim.world_reset import reset_gazebo
+        return reset_gazebo(self)
+
     def __init__(self):
         super().__init__()
         from gz.transport13 import Node
@@ -174,6 +184,10 @@ class GazeboTransport(Sensors):
 
 class RosTransport(Sensors):
     kind='ros2'
+    def reset_world(self):
+        from drone_sim.world_reset import reset_gazebo
+        return reset_gazebo(self)
+
     def __init__(self):
         super().__init__()
         import rclpy

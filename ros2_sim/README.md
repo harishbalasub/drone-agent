@@ -301,3 +301,9 @@ Validation includes mocked structured chat responses, stale decisions, assumptio
 The launcher checks its HTTP address before starting Gazebo or the bridges. If an older gateway owns the address, stop its launcher with Ctrl+C before restarting. The launcher never automatically kills an existing listener. The default address is `127.0.0.1:8100`; `DRONE_BIND_HOST` and `DRONE_PORT` configure the address.
 
 For example, `DRONE_PORT=8101 bash ros2_sim/scripts/launch.sh 1 --render-headless --rgbd` serves the app on port 8101. Parallel simulations also require different `ROS_DOMAIN_ID` and `GZ_PARTITION` values; changing the HTTP port alone does not isolate robot topics. Gateway SIGINT/SIGTERM now closes the HTTP server, and launcher cleanup has a bounded shutdown period for rendering children.
+
+### Reset Gazebo without regenerating the Robot Plan
+
+**Reset World** is enabled in external mode when the gateway supports verified reset and no mission is executing. It calls `/api/sim/reset`, preserves the completed episode under `session_logs/ros2_resets`, resets Gazebo through `/world/mission/control`, detaches the gripper, restores the initial drone/package poses and checks fresh dynamic-pose evidence. A failed reset blocks mission execution until reset succeeds. The UI retains the original Mission Spec and Behavior Tree, clears completed-goal claims and allows rerunning without an LLM call. Reset truth is not treated as mission package localization. RGB-D synchronization clears the previous episode on a backwards simulation-clock jump.
+
+The LAN app must connect to the same gateway as the intended world. A gateway left running after a completed mission continues showing that completed world's package placement; reloading the HTML does not reset physics. For the current LAN setup, the fresh Scene 1 launcher is bound to `192.168.1.171:8100`, with `ROS_DOMAIN_ID=74` and `GZ_PARTITION=drone_lan_v3`.

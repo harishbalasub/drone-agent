@@ -849,6 +849,14 @@ function recordVersion(stage){
 function rememberReusablePlan(){
  reusablePlan={scenario:document.getElementById('scenario').value,spec:clone(missionSpec),validation:clone(validationResult),pddl:pddlProblem,plan:clone(robotPlan),tree:clone(robotBehaviorTree),source:robotPlannerSource,compilerSource:missionCompilerSource,battery:Number(document.getElementById('battery').value)};
 }
+function restoreReusablePlan(saved){
+   missionSpec=clone(saved.spec);validationResult=clone(saved.validation);pddlProblem=saved.pddl;robotPlan=clone(saved.plan);robotBehaviorTree=clone(saved.tree);robotPlannerSource=saved.source;missionCompilerSource=saved.compilerSource;planWorldVersion=worldVersion;
+   document.getElementById('specOut').textContent=JSON.stringify(missionSpec,null,2);document.getElementById('pddlOut').textContent=pddlProblem;
+   document.getElementById('planOut').textContent=JSON.stringify({mission_id:missionSpec.mission_id,planner_source:robotPlannerSource,behavior_tree:executionTree()},null,2);
+   document.getElementById('validateBtn').disabled=false;for(const id of ['runBtn','pddlBtn','planBtn'])document.getElementById(id).disabled=false;
+   if(validationResult)renderValidation(validationResult);
+   badge('planBadge','PLAN READY — REUSED','good');
+}
 function applyScenario({reusePlan=false}={}){
  if(running)return;
  const saved=reusePlan&&reusablePlan?.scenario===document.getElementById('scenario').value?reusablePlan:null;
@@ -862,12 +870,7 @@ function applyScenario({reusePlan=false}={}){
  worldVersion++;verifiedState={version:0,observedAt:0,targetVisible:"UNKNOWN",targetLocalized:"UNKNOWN",gateClear:"UNKNOWN",holding:false,placed:false,atHome:true,inspectedViews:[],traversedGate:false,battery:Number(document.getElementById("battery").value)};
  completedGoals=[];stopRequested=false;humanResolver=null;editMode=true;session.outcome='NOT_STARTED';setExecutionState('IDLE');updateMode();
  if(saved){
-   missionSpec=clone(saved.spec);validationResult=clone(saved.validation);pddlProblem=saved.pddl;robotPlan=clone(saved.plan);robotBehaviorTree=clone(saved.tree);robotPlannerSource=saved.source;missionCompilerSource=saved.compilerSource;planWorldVersion=worldVersion;
-   document.getElementById('specOut').textContent=JSON.stringify(missionSpec,null,2);document.getElementById('pddlOut').textContent=pddlProblem;
-   document.getElementById('planOut').textContent=JSON.stringify({mission_id:missionSpec.mission_id,planner_source:robotPlannerSource,behavior_tree:executionTree()},null,2);
-   document.getElementById('validateBtn').disabled=false;for(const id of ['runBtn','pddlBtn','planBtn'])document.getElementById(id).disabled=false;
-   if(validationResult)renderValidation(validationResult);
-   badge('planBadge','PLAN READY — REUSED','good');
+   restoreReusablePlan(saved);
  }else{
    robotBehaviorTree=null;robotPlannerSource='none';missionSpec=null;robotPlan=[];pddlProblem='';validationResult=null;planWorldVersion=null;
    for(const id of ['validateBtn','runBtn','pddlBtn','planBtn'])document.getElementById(id).disabled=true;

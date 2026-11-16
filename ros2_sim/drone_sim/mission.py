@@ -120,7 +120,7 @@ class Executor:
         self.lock=threading.RLock(); self.stop=threading.Event();self.decision=threading.Event()
         self.thread=None;self.session=None;self.status='IDLE';self.run_id=None;self.active=False;self.heading=0.
         self.watchdog=threading.Thread(target=self._watchdog,daemon=True);self.closed=False;self.watchdog.start()
-        self.last_command=time.monotonic()
+        self.last_command=time.monotonic();self.resetting=False;self.reset_failed=False;self.archived_sessions=[]
 
     def _watchdog(self):
         while not self.closed:
@@ -178,7 +178,7 @@ class Executor:
                 'runtime_contract':contract_status(s,self.session,self.active,self.config),
                 'battery':{'available':False,'percent':None,'source':'not_modeled','reserve_verified':False},
                 'completion_behavior':'Hover at home at 1.6 m. LAND is not commissioned.',
-                'status':self.status,'run_id':self.run_id,'active':self.active,'sensors':s,
+                'status':self.status,'run_id':self.run_id,'active':self.active,'sensors':s,'reset_supported':callable(getattr(self.transport,'reset_world',None)),
                 'pose_age_seconds':now-s['pose_received'] if s['pose_received'] else None,
                 'perception_mode':self.config['perception_mode'],'pose_source':self.config['pose_source'],
                 'facts':copy.deepcopy(getattr(self,'facts',{})),'session':copy.deepcopy(self.session)}
@@ -198,6 +198,7 @@ class Executor:
     def start(self,req):
         spec,plan=validate_request(req)
         with self.lock:
+            if self.resetting or self.reset_failed:raise ValueError('Complete a verified world reset before starting a mission')
             if self.active:raise ValueError('A mission is already running')
             if self.session is not None:raise ValueError('Restart the simulator and gateway for a fresh episode before running another mission')
             if not self.state()['connected']:raise ValueError('No fresh simulator odometry. Start Gazebo and the ROS bridge first.')
@@ -216,6 +217,28 @@ class Executor:
         self.session['versions'].append({'version':self.revision,'time':utc(),'reason':reason,'mission_spec':copy.deepcopy(spec),
             'validation':{'status':'ACCEPTED','html_validation':getattr(self,'original_validation',None),'scope':'supported arguments, goal coverage, runtime geometry and observations'},'robot_plan':copy.deepcopy(self.execution_tree) if reason=='INITIAL' else build_tree(spec,plan),'nominal_plan':copy.deepcopy(plan),
             'pddl':self.original_pddl if self.revision==1 else '; Recovery executed by policy controller; no solver-generated recovery PDDL.\n','state':self.transport.snapshot()})
+
+    def reset_world(self):
+        with self.lock:
+            if self.active or self.resetting:raise ValueError('Stop the mission before resetting the world')
+            if not callable(getattr(self.transport,'reset_world',None)):raise ValueError('This transport does not support world reset')
+            self.resetting=True;self.status='RESETTING';self.hold_anchor=None
+        try:
+            if self.thread:self.thread.join(timeout=3)
+            if self.thread and self.thread.is_alive():raise RuntimeError('Execution thread has not stopped')
+            self.transport.velocity([0,0,0]);self.transport.clear_observations()
+            evidence=self.transport.reset_world()
+            state=self.transport.snapshot()
+            if not state['pose_received'] or time.monotonic()-state['pose_received']>self.config['sensor_timeout']:raise RuntimeError('Fresh odometry missing after reset')
+            with self.lock:
+                if self.session is not None:self.archived_sessions.append(copy.deepcopy(self.session))
+                self.session=None;self.run_id=None;self.thread=None;self.status='IDLE';self.reset_failed=False
+                self.config=copy.deepcopy(self.base_config);self.heading=0.;self.stop.clear();self.decision.clear()
+                self.facts={'found':False,'inspected':{},'holding':False,'picked':False,'placed':False,'traversed':False,'at_home':False,'landed':False}
+                return {'status':'IDLE','reset_evidence':evidence,'archived_sessions':len(self.archived_sessions)}
+        except Exception:
+            self.status='RESET_FAILED';self.reset_failed=True;raise
+        finally:self.resetting=False
 
     def cancel(self):
         self.stop.set();self.decision.set();self.transport.velocity([0,0,0]);return {'status':'STOP_REQUESTED'}
