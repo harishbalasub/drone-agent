@@ -13,13 +13,30 @@ class ChatSupervisor(unittest.TestCase):
         self.run_case('''
 await document.getElementById('generateBtn').onclick();
 if(!missionSpec.assumptions.some(a=>a.constraint_name==='minimum_view_separation_deg'))throw new Error('Hidden system angle');
-document.getElementById('validateBtn').onclick();if(validationResult.status!=='NEEDS_CLARIFICATION')throw new Error('Assumption did not block');
+document.getElementById('validateBtn').onclick();if(validationResult.status!=='NEEDS_CLARIFICATION')throw new Error('Assumption did not block');if(!document.getElementById('clarificationPanel').hidden)throw new Error('Legacy form duplicated chat review');
 const stale=action('Accept assumption');await action('Change angle').onclick();
 const editor=descendants(document.getElementById('chatThread')).filter(n=>n.className==='chat-editor').at(-1);editor.children[0].value='45';editor.children[1].onclick();
 if(missionSpec.constraints[0].params.degrees!==45||missionSpec.assumptions.length||robotPlan.length||validationResult.status!=='ACCEPTED')throw new Error('Angle edit did not revalidate');
 await stale.onclick();if(missionSpec.constraints[0].params.degrees!==45)throw new Error('Old card changed mission');
 document.getElementById('battery').value=20;document.getElementById('validateBtn').onclick();
 if(validationResult.status!=='REJECTED'||!session.events.some(e=>e.message_type==='CHAT_MESSAGE'&&e.title==='Mission cannot start'&&e.text.includes('reserve')))throw new Error('Battery issue not surfaced');
+''')
+    def test_model_and_ui_angle_assumptions_are_one_review(self):
+        self.run_case('''
+const goal=document.getElementById('mission').value;
+missionSpec=normalizeMissionSpec({...localCompile(goal),assumptions:[
+ {text:'Inspection viewpoints should be at least 30 degrees apart.',source:'EXPLICIT_ASSUMPTION'},
+ {text:'Use 30-degree separation between the viewpoints.',source:'EXPLICIT_ASSUMPTION',constraint_name:'minimum_view_separation_deg'},
+ {text:'The package has a suitable pickup handle.',source:'EXPLICIT_ASSUMPTION'}]},goal);
+missionRevision++;DroneChat.addAngleReview();DroneChat.showReview();DroneChat.showReview();
+const angle=missionSpec.assumptions.filter(a=>a.constraint_name==='minimum_view_separation_deg');
+if(angle.length!==1||missionSpec.assumptions.length!==2||angle[0].original_assumption_texts.length!==2)throw new Error('Angle assumptions were not merged or other assumption was lost');
+const reviews=session.events.filter(e=>e.title==='Assumption needs your review');if(reviews.length!==2)throw new Error('Repeated review card');
+await action('Accept assumption').onclick();
+if(missionSpec.assumptions.length!==1||!missionSpec.user_goal.includes('separation is 30 degrees')||missionSpec.constraints[0].source!=='USER')throw new Error('Accepted angle was not recorded');
+const count=session.events.filter(e=>e.title==='Assumption needs your review'&&e.text.includes('30°')).length;
+DroneChat.addAngleReview();DroneChat.showReview();
+if(missionSpec.assumptions.some(a=>a.constraint_name==='minimum_view_separation_deg')||session.events.filter(e=>e.title==='Assumption needs your review'&&e.text.includes('30°')).length!==count)throw new Error('Accepted angle asked again');
 ''')
     def test_confirmation_milestones_and_reset(self):
         self.run_case('''

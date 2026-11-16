@@ -70,13 +70,32 @@
       }catch(e){return {...safeFrame(camera,label),reason:'Simulated view unavailable'};}
     });
   }
+  function isAngleAssumption(a){
+    if(a.constraint_name==='minimum_view_separation_deg')return true;
+    const text=String(a.text||'').toLowerCase();
+    // Legacy/text-only compiler responses lack the structured constraint link.
+    return /(?:view|inspect)/.test(text)&&/(?:separat|angle|degrees?|°|apart)/.test(text)||/(?:separat|apart)/.test(text)&&/(?:degrees?|°)/.test(text);
+  }
+  function noteAcceptedAngle(){
+    const c=missionSpec.constraints.find(c=>c.name==='minimum_view_separation_deg');
+    if(!c)return;
+    c.source='USER';
+    const clause='User clarification: minimum inspection viewpoint separation is '+c.params.degrees+' degrees.';
+    if(!missionSpec.user_goal.includes(clause))missionSpec.user_goal+='\n'+clause;
+    el('mission').value=missionSpec.user_goal;
+  }
   function addAngleReview(){
     if(!missionSpec)return;
-    const c=(missionSpec.constraints||[]).find(c=>c.name==='minimum_view_separation_deg');
-    if(!c||c.source==='USER'||missionSpec.user_confirmed_assumptions?.some(a=>a.constraint_name===c.name)||missionSpec.assumptions.some(a=>a.constraint_name===c.name))return;
+    const c=(missionSpec.constraints||[]).find(c=>c.name==='minimum_view_separation_deg');if(!c)return;
+    const linked=missionSpec.assumptions.filter(isAngleAssumption);
+    if(c.source==='USER'||missionSpec.user_confirmed_assumptions?.some(isAngleAssumption)){
+      missionSpec.assumptions=missionSpec.assumptions.filter(a=>!isAngleAssumption(a));return;
+    }
     c.source='EXPLICIT_ASSUMPTION';
     const text='Use a minimum separation of '+c.params.degrees+'° between inspection viewpoints. This value was proposed by the system, not explicitly supplied by you.';
-    missionSpec.assumptions.push({text,source:'EXPLICIT_ASSUMPTION',constraint_name:c.name});
+    const canonical={text,source:'EXPLICIT_ASSUMPTION',constraint_name:c.name};
+    if(linked.length)canonical.original_assumption_texts=[...new Set(linked.flatMap(a=>a.original_assumption_texts||[a.text]))];
+    missionSpec.assumptions=[...missionSpec.assumptions.filter(a=>!isAngleAssumption(a)),canonical];
     validationResult=null;el('specOut').textContent=JSON.stringify(missionSpec,null,2);recordVersion('CHAT_ASSUMPTION_REVIEW_REQUIRED');
   }
   function confirmAssumption(index,s){
@@ -84,7 +103,7 @@
     const a=missionSpec.assumptions[index];if(!a)throw new Error('Assumption is no longer pending.');
     missionSpec.user_confirmed_assumptions=missionSpec.user_confirmed_assumptions||[];
     missionSpec.user_confirmed_assumptions.push({...a,source:'USER',original_source:a.source,confirmed_at:new Date().toISOString(),scope:'Planning premise; not a verified observation'});
-    if(a.constraint_name){const c=missionSpec.constraints.find(c=>c.name===a.constraint_name);if(c)c.source='USER';}
+    if(a.constraint_name){const c=missionSpec.constraints.find(c=>c.name===a.constraint_name);if(c)noteAcceptedAngle();}
     missionSpec.assumptions.splice(index,1);missionRevision++;invalidateClarifiedPlan();recordVersion('CHAT_ASSUMPTION_CONFIRMED');el('specOut').textContent=JSON.stringify(missionSpec,null,2);
     card('Assumption accepted',a.text,{kind:'user'});el('validateBtn').onclick();
   }
@@ -165,9 +184,11 @@
     await originalGenerate();if(!missionSpec)return;
     addAngleReview();card('Mission specification prepared',missionSpec.user_goal,{actions:[buttonAction('validateBtn','Validate mission')],evidence:{mission_id:missionSpec.mission_id,mission_version:missionRevision,compiler_source:missionCompilerSource}});showReview();
   };
+  // Chat owns assumption review; keep the legacy form from asking it again.
+  const originalClarifications=renderClarifications;renderClarifications=()=>{originalClarifications();el('clarificationPanel').hidden=true;};
   const originalRenderValidation=renderValidation;renderValidation=result=>{originalRenderValidation(result);reportValidation(result);};
   const originalConfirm=confirmSelectedAssumptions;confirmSelectedAssumptions=()=>{
-    for(const [i,a] of (missionSpec?.assumptions||[]).entries())if(a.constraint_name&&el('assumptionConfirm_'+i)?.checked){const c=missionSpec.constraints.find(c=>c.name===a.constraint_name);if(c)c.source='USER';}
+    for(const [i,a] of (missionSpec?.assumptions||[]).entries())if(a.constraint_name&&el('assumptionConfirm_'+i)?.checked){const c=missionSpec.constraints.find(c=>c.name===a.constraint_name);if(c)noteAcceptedAngle();}
     originalConfirm();
   };
   // The existing button may already hold the prior function; rendering assigns the wrapper.
