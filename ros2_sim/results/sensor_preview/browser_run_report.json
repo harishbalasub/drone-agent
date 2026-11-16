@@ -1,0 +1,38 @@
+{
+  "outcome": "MISSION_COMPLETED",
+  "backend": "ros2",
+  "facts": {
+    "found": true,
+    "inspected": {
+      "view_a": [
+        6.4506459469431086,
+        1.3005824425663433,
+        1.5998487961998937
+      ],
+      "view_b": [
+        7.75230512454684,
+        1.3006259017859352,
+        1.6032636948095207
+      ]
+    },
+    "holding": false,
+    "picked": true,
+    "placed": true,
+    "traversed": true,
+    "at_home": true,
+    "landed": false
+  },
+  "duration_seconds": 75.54890150297433,
+  "saved_session": "session_logs/ros2_ui_verification/20261111T233556Z_2b73db51",
+  "rendered_rgb_cameras": [
+    "front",
+    "down",
+    "external"
+  ],
+  "depth": {
+    "received": 5039292.265416652,
+    "center_median_m": 1.5126203298568726,
+    "width": 256,
+    "height": 256
+  }
+}

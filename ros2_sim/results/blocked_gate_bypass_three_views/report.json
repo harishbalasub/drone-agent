@@ -1,0 +1,34 @@
+{
+  "source": "gazebo_world_pose_evaluation_only",
+  "drone_pose": [
+    0.8479391273737827,
+    0.649373551070883,
+    1.6031832950958849
+  ],
+  "package_pose": [
+    7.59856756111403,
+    4.148643351353321,
+    0.6199998553991425
+  ],
+  "home_verified": true,
+  "placement_verified": true,
+  "samples": 3742,
+  "reported_outcome": "MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS",
+  "requested_views": 3,
+  "expected_outcome": "MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS",
+  "actual_outcome": "MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS",
+  "backend": "gazebo_native",
+  "scenario": 2,
+  "policy": "bypass",
+  "observed_views": 3,
+  "collision": false,
+  "duration_seconds": 74.54863827954978,
+  "perception_mode": "logical_camera_oracle",
+  "controller": {
+    "kp": 1.1,
+    "max_speed": 0.65,
+    "tolerance": 0.09,
+    "settle_seconds": 0.6
+  },
+  "passed": true
+}

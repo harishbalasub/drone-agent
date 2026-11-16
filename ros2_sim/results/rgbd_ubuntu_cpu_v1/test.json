@@ -1,0 +1,22 @@
+{
+  "mode": "learned_rgb_segmentation_plus_depth_geometry",
+  "split": "test",
+  "samples": 12,
+  "visible_targets": 8,
+  "accepted_visible": 8,
+  "visible_recall": 1.0,
+  "negative_frames": 4,
+  "false_accepts": 0,
+  "false_accept_rate": 0.0,
+  "mask_iou": 0.7682579829276004,
+  "median_xy_error_m": 0.013417030475728557,
+  "p95_xy_error_m": 0.02902911430904498,
+  "median_3d_error_m": 0.013417030479546746,
+  "median_latency_ms": 29.19474570080638,
+  "assumptions": [
+    "upright package of known 0.24 m height",
+    "simulated motion-capture camera pose",
+    "registered optical-axis depth"
+  ],
+  "checkpoint": "ros2_sim/results/rgbd_ubuntu_cpu_v1/best.pt"
+}

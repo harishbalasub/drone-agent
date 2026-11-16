@@ -1,0 +1,6 @@
+# Install with --extra-index-url https://download.pytorch.org/whl/cpu
+# Pilot verified on Python 3.9, Ubuntu x86_64. Spark needs ARM64 CUDA wheels/container.
+torch==2.6.0+cpu
+torchvision==0.21.0+cpu
+numpy==1.26.4
+pillow==11.3.0

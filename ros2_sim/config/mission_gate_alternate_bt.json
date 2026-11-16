@@ -1,0 +1,319 @@
+{
+  "mission_spec": {
+    "mission_id": "mission_ros2_example",
+    "user_goal": "Find the red package, inspect it from three viewpoints, pick it up, fly through the gate, place it on the blue platform, and return home. If gate is not clear, goto blue platform directly.",
+    "entities": [
+      {
+        "id": "drone",
+        "type": "drone",
+        "source": "SYSTEM_POLICY"
+      },
+      {
+        "id": "home",
+        "type": "location",
+        "source": "SYSTEM_POLICY"
+      },
+      {
+        "id": "red_package",
+        "type": "object",
+        "source": "USER"
+      },
+      {
+        "id": "blue_platform",
+        "type": "platform",
+        "source": "USER"
+      },
+      {
+        "id": "gate_1",
+        "type": "gate",
+        "source": "USER"
+      },
+      {
+        "id": "view_a",
+        "type": "viewpoint",
+        "source": "SYSTEM_POLICY"
+      },
+      {
+        "id": "view_b",
+        "type": "viewpoint",
+        "source": "SYSTEM_POLICY"
+      }
+    ],
+    "goals": [
+      {
+        "id": "G1",
+        "predicate": "found",
+        "args": [
+          "red_package"
+        ],
+        "source": "USER",
+        "source_text": "Find the red package"
+      },
+      {
+        "id": "G4",
+        "predicate": "holding",
+        "args": [
+          "red_package"
+        ],
+        "source": "USER",
+        "source_text": "pick it up"
+      },
+      {
+        "id": "G5",
+        "predicate": "traversed",
+        "args": [
+          "gate_1"
+        ],
+        "source": "USER",
+        "source_text": "fly through the gate"
+      },
+      {
+        "id": "G6",
+        "predicate": "placed",
+        "args": [
+          "red_package",
+          "blue_platform"
+        ],
+        "source": "USER",
+        "source_text": "place it on the blue platform"
+      },
+      {
+        "id": "G7",
+        "predicate": "at",
+        "args": [
+          "home"
+        ],
+        "source": "USER",
+        "source_text": "return home"
+      },
+      {
+        "id": "INSPECT_0",
+        "predicate": "inspected",
+        "args": [
+          "red_package",
+          "view_0"
+        ],
+        "source": "USER",
+        "source_text": "inspect it from two viewpoints"
+      },
+      {
+        "id": "INSPECT_1",
+        "predicate": "inspected",
+        "args": [
+          "red_package",
+          "view_1"
+        ],
+        "source": "USER",
+        "source_text": "inspect it from two viewpoints"
+      },
+      {
+        "id": "INSPECT_2",
+        "predicate": "inspected",
+        "args": [
+          "red_package",
+          "view_2"
+        ],
+        "source": "USER",
+        "source_text": "inspect it from two viewpoints"
+      }
+    ],
+    "ordering": [
+      {
+        "before": "G1",
+        "after": "INSPECT_0",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "INSPECT_0",
+        "after": "INSPECT_1",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "INSPECT_1",
+        "after": "INSPECT_2",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "INSPECT_2",
+        "after": "G4",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G4",
+        "after": "G5",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G5",
+        "after": "G6",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G6",
+        "after": "G7",
+        "source": "TASK_SEMANTICS"
+      }
+    ],
+    "constraints": [
+      {
+        "name": "minimum_view_separation_deg",
+        "type": "geometry",
+        "params": {
+          "degrees": 30
+        },
+        "source": "SYSTEM_POLICY"
+      }
+    ],
+    "assumptions": [],
+    "unresolved": [],
+    "requested_capabilities": [
+      "SEARCH",
+      "INSPECT",
+      "PICK",
+      "TRAVERSE_GATE",
+      "NAVIGATE",
+      "PLACE",
+      "RETURN_HOME"
+    ],
+    "contingencies": [
+      {
+        "trigger": "gate_not_clear",
+        "action": "BYPASS_GATE",
+        "authorization": "USER",
+        "fallback": "ABORT_AND_RETURN_HOME",
+        "source_text": "If gate is not clear, goto blue platform directly."
+      }
+    ]
+  },
+  "robot_plan": {
+    "format": "behavior_tree_v1",
+    "root": {
+      "type": "Sequence",
+      "children": [
+        {
+          "type": "Action",
+          "skill": "SEARCH",
+          "args": [
+            "red_package"
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "INSPECT",
+          "args": [
+            "red_package",
+            "view_0"
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "INSPECT",
+          "args": [
+            "red_package",
+            "view_1"
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "INSPECT",
+          "args": [
+            "red_package",
+            "view_2"
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "NAVIGATE",
+          "args": [
+            "target_loc"
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "PICK",
+          "args": [
+            "red_package"
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "NAVIGATE",
+          "args": [
+            "gate_loc"
+          ]
+        },
+        {
+          "type": "Fallback",
+          "children": [
+            {
+              "type": "Sequence",
+              "children": [
+                {
+                  "type": "Condition",
+                  "predicate": "gate_clear",
+                  "args": [
+                    "gate_1"
+                  ]
+                },
+                {
+                  "type": "Action",
+                  "skill": "TRAVERSE_GATE",
+                  "args": [
+                    "gate_1"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Sequence",
+              "children": [
+                {
+                  "type": "Condition",
+                  "predicate": "gate_blocked",
+                  "args": [
+                    "gate_1"
+                  ]
+                },
+                {
+                  "type": "Action",
+                  "skill": "BYPASS_GATE",
+                  "args": [
+                    "gate_1"
+                  ]
+                },
+                {
+                  "type": "Action",
+                  "skill": "NAVIGATE",
+                  "args": [
+                    "blue_platform"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "NAVIGATE",
+          "args": [
+            "blue_platform"
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "PLACE",
+          "args": [
+            "red_package",
+            "blue_platform"
+          ]
+        },
+        {
+          "type": "Action",
+          "skill": "RETURN_HOME",
+          "args": []
+        }
+      ]
+    }
+  },
+  "pddl": "(define (problem accountable-drone-mission)\n  (:domain accountable-drone)\n  (:objects\n    drone - drone\n    red_package - object\n    home current_loc target_loc gate_loc blue_platform - location\n    gate_1 - gate\n    view_a view_b - viewpoint)\n  (:init\n    (at drone home)\n    (reachable home)\n    (reachable current_loc)\n    (reachable target_loc)\n    (reachable gate_loc)\n    (reachable blue_platform)\n    (platform blue_platform)\n    (gate-at gate_1 gate_loc)\n    (gripper-empty drone)\n    (object-at red_package target_loc)\n    (gate-clear gate_1))\n  (:goal (and\n    (found red_package)\n    (inspected red_package view_a)\n    (inspected red_package view_b)\n    (traversed gate_1)\n    (placed red_package blue_platform)\n    (at drone home)\n  ))\n)"
+}

@@ -1,0 +1,131 @@
+{
+  "status": "EXECUTING",
+  "sensors": {
+    "position": [
+      0.8648570267063296,
+      0.6497528377799814,
+      1.593188218241143
+    ],
+    "velocity": [
+      -0.038688969618457345,
+      0.0006396845486652266,
+      -0.005264955114280075
+    ],
+    "yaw": 9.839488254223077e-06,
+    "pose_received": 5038552.618836022,
+    "objects": {
+      "gate_left": {
+        "position": [
+          4.9,
+          3.6499999999999995,
+          1.2499999999999998
+        ],
+        "received": 5038552.5586681,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "gate_right": {
+        "position": [
+          6.199999999999999,
+          3.6499999999999995,
+          1.2499999999999998
+        ],
+        "received": 5038552.5586681,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "gate_top": {
+        "position": [
+          5.55,
+          3.6500000000000004,
+          2.5
+        ],
+        "received": 5038552.5586681,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "ground": {
+        "position": [
+          4.5,
+          2.6,
+          -0.050000000000000266
+        ],
+        "received": 5038552.5586681,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "obstacle_1": {
+        "position": [
+          3.5999999999999996,
+          2.3499999999999996,
+          1.0
+        ],
+        "received": 5038552.5586681,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "home": {
+        "position": [
+          0.8500000000000001,
+          0.65,
+          0.0050000000000001155
+        ],
+        "received": 5038552.559127961,
+        "camera": "down",
+        "source": "logical_camera_oracle"
+      },
+      "red_package": {
+        "position": [
+          0.8390857109748662,
+          0.6502814364768874,
+          1.1604817717040696
+        ],
+        "received": 5038552.559127961,
+        "camera": "down",
+        "source": "logical_camera_oracle"
+      },
+      "blue_platform": {
+        "position": [
+          7.6,
+          4.1499999999999995,
+          0.24999999999999978
+        ],
+        "received": 5038549.966394411,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      }
+    },
+    "gripper": "attached",
+    "gripper_received": 5038528.662004452,
+    "contacts": [],
+    "contact_received": 0.0,
+    "imu_received": 5038552.618957689,
+    "cameras": {},
+    "semantic_received": {
+      "front": 5038552.5586681,
+      "down": 5038552.559127961
+    },
+    "sequence": 1472
+  },
+  "facts": {
+    "found": true,
+    "inspected": {
+      "view_a": [
+        6.435552978715442,
+        1.2752502752751977,
+        1.6005396127524947
+      ],
+      "view_b": [
+        7.721171970153013,
+        1.3006180391673758,
+        1.6026225531413114
+      ]
+    },
+    "holding": true,
+    "picked": true,
+    "placed": false,
+    "traversed": false,
+    "at_home": false,
+    "landed": false
+  }
+}

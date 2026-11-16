@@ -1,0 +1,15 @@
+{
+  "host": "Ubuntu local",
+  "device": "cpu",
+  "gpu_status": "nvidia-smi could not communicate with local NVIDIA driver",
+  "dgx_discovery": {
+    "source": "NVIDIA Sync SSH config",
+    "alias": "spark-harish",
+    "hostname": "spark-5d76",
+    "gpu": "NVIDIA GB10",
+    "ssh_verified": true,
+    "remote_training_started": false
+  },
+  "dataset_manifest_sha256": "91e955d0bd39ce637754fc408380f3383166c1225f7d56edfbe784ad453848f4",
+  "command": "TORCH_HOME=ros2_sim/.runtime/torch_cache OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 ros2_sim/.runtime/rgbd_venv/bin/python ros2_sim/rgbd/train_segmentation.py --dataset ros2_sim/datasets/rgbd_pilot_v2 --output ros2_sim/results/rgbd_ubuntu_cpu_v1 --epochs 30 --batch-size 2 --device cpu --workers 0 --threads 2"
+}

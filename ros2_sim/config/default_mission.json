@@ -1,0 +1,253 @@
+{
+  "mission_spec": {
+    "mission_id": "mission_ros2_example",
+    "user_goal": "Find the red package, inspect it from two viewpoints, pick it up, fly through the gate, place it on the blue platform, and return home.",
+    "entities": [
+      {
+        "id": "drone",
+        "type": "drone",
+        "source": "SYSTEM_POLICY"
+      },
+      {
+        "id": "home",
+        "type": "location",
+        "source": "SYSTEM_POLICY"
+      },
+      {
+        "id": "red_package",
+        "type": "object",
+        "source": "USER"
+      },
+      {
+        "id": "blue_platform",
+        "type": "platform",
+        "source": "USER"
+      },
+      {
+        "id": "gate_1",
+        "type": "gate",
+        "source": "USER"
+      },
+      {
+        "id": "view_a",
+        "type": "viewpoint",
+        "source": "SYSTEM_POLICY"
+      },
+      {
+        "id": "view_b",
+        "type": "viewpoint",
+        "source": "SYSTEM_POLICY"
+      }
+    ],
+    "goals": [
+      {
+        "id": "G1",
+        "predicate": "found",
+        "args": [
+          "red_package"
+        ],
+        "source": "USER",
+        "source_text": "Find the red package"
+      },
+      {
+        "id": "G2",
+        "predicate": "inspected",
+        "args": [
+          "red_package",
+          "view_a"
+        ],
+        "source": "USER",
+        "source_text": "inspect it from two viewpoints"
+      },
+      {
+        "id": "G3",
+        "predicate": "inspected",
+        "args": [
+          "red_package",
+          "view_b"
+        ],
+        "source": "USER",
+        "source_text": "inspect it from two viewpoints"
+      },
+      {
+        "id": "G4",
+        "predicate": "holding",
+        "args": [
+          "red_package"
+        ],
+        "source": "USER",
+        "source_text": "pick it up"
+      },
+      {
+        "id": "G5",
+        "predicate": "traversed",
+        "args": [
+          "gate_1"
+        ],
+        "source": "USER",
+        "source_text": "fly through the gate"
+      },
+      {
+        "id": "G6",
+        "predicate": "placed",
+        "args": [
+          "red_package",
+          "blue_platform"
+        ],
+        "source": "USER",
+        "source_text": "place it on the blue platform"
+      },
+      {
+        "id": "G7",
+        "predicate": "at",
+        "args": [
+          "home"
+        ],
+        "source": "USER",
+        "source_text": "return home"
+      }
+    ],
+    "ordering": [
+      {
+        "before": "G1",
+        "after": "G2",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G1",
+        "after": "G3",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G2",
+        "after": "G4",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G3",
+        "after": "G4",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G4",
+        "after": "G5",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G5",
+        "after": "G6",
+        "source": "TASK_SEMANTICS"
+      },
+      {
+        "before": "G6",
+        "after": "G7",
+        "source": "TASK_SEMANTICS"
+      }
+    ],
+    "constraints": [
+      {
+        "name": "minimum_view_separation_deg",
+        "type": "geometry",
+        "params": {
+          "degrees": 30
+        },
+        "source": "SYSTEM_POLICY"
+      }
+    ],
+    "assumptions": [],
+    "unresolved": [],
+    "requested_capabilities": [
+      "SEARCH",
+      "INSPECT",
+      "PICK",
+      "TRAVERSE_GATE",
+      "NAVIGATE",
+      "PLACE",
+      "RETURN_HOME"
+    ]
+  },
+  "robot_plan": [
+    {
+      "step": 1,
+      "skill": "SEARCH",
+      "args": [
+        "red_package"
+      ],
+      "why": "Establish found/visible/localized target state."
+    },
+    {
+      "step": 2,
+      "skill": "INSPECT",
+      "args": [
+        "red_package",
+        "view_a"
+      ],
+      "why": "Satisfy inspection goal G2 at view_a."
+    },
+    {
+      "step": 3,
+      "skill": "INSPECT",
+      "args": [
+        "red_package",
+        "view_b"
+      ],
+      "why": "Satisfy inspection goal G3 at view_b."
+    },
+    {
+      "step": 4,
+      "skill": "NAVIGATE",
+      "args": [
+        "target_loc"
+      ],
+      "why": "Reach target before pickup."
+    },
+    {
+      "step": 5,
+      "skill": "PICK",
+      "args": [
+        "red_package"
+      ],
+      "why": "Acquire target object."
+    },
+    {
+      "step": 6,
+      "skill": "NAVIGATE",
+      "args": [
+        "gate_loc"
+      ],
+      "why": "Reach gate."
+    },
+    {
+      "step": 7,
+      "skill": "TRAVERSE_GATE",
+      "args": [
+        "gate_1"
+      ],
+      "why": "Satisfy gate traversal goal."
+    },
+    {
+      "step": 8,
+      "skill": "NAVIGATE",
+      "args": [
+        "blue_platform"
+      ],
+      "why": "Reach delivery platform."
+    },
+    {
+      "step": 9,
+      "skill": "PLACE",
+      "args": [
+        "red_package",
+        "blue_platform"
+      ],
+      "why": "Satisfy placement goal."
+    },
+    {
+      "step": 10,
+      "skill": "RETURN_HOME",
+      "args": [],
+      "why": "Satisfy return-home goal."
+    }
+  ],
+  "pddl": "(define (problem accountable-drone-mission)\n  (:domain accountable-drone)\n  (:objects\n    drone - drone\n    red_package - object\n    home current_loc target_loc gate_loc blue_platform - location\n    gate_1 - gate\n    view_a view_b - viewpoint)\n  (:init\n    (at drone home)\n    (reachable home)\n    (reachable current_loc)\n    (reachable target_loc)\n    (reachable gate_loc)\n    (reachable blue_platform)\n    (platform blue_platform)\n    (gate-at gate_1 gate_loc)\n    (gripper-empty drone)\n    (object-at red_package target_loc)\n    (gate-clear gate_1))\n  (:goal (and\n    (found red_package)\n    (inspected red_package view_a)\n    (inspected red_package view_b)\n    (traversed gate_1)\n    (placed red_package blue_platform)\n    (at drone home)\n  ))\n)"
+}

@@ -1,0 +1,20 @@
+{
+  "source": "ROS_sensor_evidence_only",
+  "reported_outcome": "MISSION_COMPLETED",
+  "expected_outcome": "MISSION_COMPLETED",
+  "actual_outcome": "MISSION_COMPLETED",
+  "backend": "ros2",
+  "scenario": 1,
+  "policy": "abort",
+  "observed_views": 2,
+  "collision": false,
+  "duration_seconds": 75.2896722825244,
+  "perception_mode": "logical_camera_oracle",
+  "controller": {
+    "kp": 1.1,
+    "max_speed": 0.65,
+    "tolerance": 0.09,
+    "settle_seconds": 0.6
+  },
+  "passed": true
+}

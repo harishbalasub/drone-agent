@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0",
+  "task": "red_package_instance_segmentation_and_metric_localization",
+  "initial_classes": {
+    "0": "background",
+    "1": "red_package"
+  },
+  "proposal_not_a_collected_dataset": true,
+  "full_dataset_target": {
+    "episodes": 500,
+    "views_per_episode": 20,
+    "total_rgbd_pairs": 10000
+  },
+  "split_by_episode_seed": {
+    "train": 0.7,
+    "validation": 0.15,
+    "test": 0.15
+  },
+  "target_absent_fraction": 0.2,
+  "variation": [
+    "package position",
+    "package yaw",
+    "camera altitude and offset",
+    "lighting",
+    "floor color",
+    "distractor geometry and color",
+    "partial occlusion"
+  ],
+  "stored_per_sample": [
+    "RGB PNG",
+    "float32 depth NPY in meters",
+    "visible package mask PNG",
+    "simulation timestamp",
+    "camera intrinsics",
+    "world-from-camera transform",
+    "package center ground truth",
+    "episode seed and split"
+  ],
+  "training": {
+    "model": "torchvision lraspp_mobilenet_v3_large",
+    "initialization": "pretrained RGB backbone",
+    "output_classes": 2,
+    "loss": "weighted cross entropy plus Dice",
+    "optimizer": "AdamW",
+    "initial_learning_rate": 0.0001,
+    "maximum_epochs": 30,
+    "selection": "validation mask IoU, followed by localization acceptance checks; no test tuning"
+  },
+  "geometry": {
+    "depth": "registered optical-axis Z, not ray range",
+    "camera_frame": "Gazebo camera FLU",
+    "package_size_prior_m": [
+      0.18,
+      0.18,
+      0.24
+    ],
+    "minimum_valid_mask_pixels": 25,
+    "maximum_pair_skew_seconds": 0.01
+  },
+  "acceptance_targets_not_measured_results": {
+    "median_package_xy_error_m": 0.03,
+    "p95_package_xy_error_m": 0.06,
+    "minimum_visible_target_recall": 0.95,
+    "maximum_false_accept_rate_absent": 0.01
+  },
+  "evaluation": [
+    "mask IoU",
+    "target absent false positives",
+    "visible target recall",
+    "3D and XY center errors",
+    "latency",
+    "mission pickup/delivery outcomes with oracle package access disabled"
+  ],
+  "scope": "package only initially; gate/obstacle observations remain explicitly separate until their perception models are trained"
+}

@@ -1,0 +1,22 @@
+{
+  "mode": "oracle_mask_geometry_diagnostic_NOT_LEARNED",
+  "split": "validation",
+  "samples": 12,
+  "visible_targets": 8,
+  "accepted_visible": 8,
+  "visible_recall": 1.0,
+  "negative_frames": 4,
+  "false_accepts": 0,
+  "false_accept_rate": 0.0,
+  "mask_iou": 1.0,
+  "median_xy_error_m": 0.008017567378926296,
+  "p95_xy_error_m": 0.025167931045824588,
+  "median_3d_error_m": 0.008017567380682314,
+  "median_latency_ms": 1.01415254175663,
+  "assumptions": [
+    "upright package of known 0.24 m height",
+    "simulated motion-capture camera pose",
+    "registered optical-axis depth"
+  ],
+  "checkpoint": null
+}

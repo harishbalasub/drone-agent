@@ -1,0 +1,30 @@
+{
+  "dataset": "ros2_sim/datasets/rgbd_pilot_v2",
+  "episodes": 20,
+  "rgbd_pairs": 80,
+  "split_counts": {
+    "train": 56,
+    "validation": 12,
+    "test": 12
+  },
+  "neural_training_completed": true,
+  "reason": "Completed 30 epochs on Ubuntu CPU; local NVIDIA driver unavailable",
+  "runtime_oracle_replaced": true,
+  "geometry_report_scope": "validation split with ground-truth masks only; not trained perception performance",
+  "training_run": "ros2_sim/results/rgbd_ubuntu_cpu_v1",
+  "selected_epoch": 10,
+  "dgx_connection": "NVIDIA Sync spark-harish SSH profile verified; NVIDIA GB10; remote training not started",
+  "evaluation_scope": "Learned checkpoint evaluated on 12 held-out test frames from three unseen scene seeds; small synthetic pilot only",
+  "preferred_training_host": "DGX Spark via NVIDIA Sync spark-harish",
+  "spark_training_completed": true,
+  "spark_training_run": "ros2_sim/results/rgbd_spark_cuda_v1",
+  "runtime_scope": "Opt-in --rgbd mode blocks ideal package observations; other scene semantics remain ideal; default baseline preserved",
+  "end_to_end_native_report": "ros2_sim/results/rgbd_pickup_v2/report.json",
+  "limitations": [
+    "Known upright package height and ground/platform supports",
+    "Simulated mocap camera pose",
+    "Attachment joint and odometry verify test lift",
+    "Small synthetic dataset; broader robustness not established"
+  ],
+  "end_to_end_ros2_report": "ros2_sim/results/rgbd_pickup_ros2/report.json"
+}

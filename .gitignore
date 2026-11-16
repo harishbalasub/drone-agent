@@ -7,3 +7,9 @@ __pycache__/
 .env.*
 session_logs/
 logs/
+
+*.log
+
+*.pt
+
+*.pth

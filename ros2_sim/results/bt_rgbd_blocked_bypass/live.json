@@ -1,0 +1,211 @@
+{
+  "status": "EXECUTING",
+  "sensors": {
+    "position": [
+      0.8543559525973887,
+      0.6492483457014457,
+      1.6034670652660552
+    ],
+    "velocity": [
+      0.000957262381145961,
+      0.017884120584602824,
+      -0.003561417236754389
+    ],
+    "yaw": 1.5708002126056988,
+    "pose_received": 5192530.4529813,
+    "objects": {
+      "home": {
+        "position": [
+          0.8499999999999998,
+          0.6499999999999999,
+          0.004999999999999449
+        ],
+        "received": 5192530.437097917,
+        "camera": "down",
+        "source": "logical_camera_oracle"
+      },
+      "gate_blocker": {
+        "position": [
+          5.550000000000001,
+          3.650000000000001,
+          1.1000000000000005
+        ],
+        "received": 5192527.909075176,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "gate_left": {
+        "position": [
+          4.8999999999999995,
+          3.649999999999998,
+          1.25
+        ],
+        "received": 5192529.084988545,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "gate_right": {
+        "position": [
+          6.200000000000001,
+          3.65,
+          1.2499999999999996
+        ],
+        "received": 5192526.823428183,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "gate_top": {
+        "position": [
+          5.550000000000001,
+          3.6500000000000017,
+          2.5000000000000004
+        ],
+        "received": 5192527.909075176,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "ground": {
+        "position": [
+          4.5,
+          2.6000000000000005,
+          -0.0499999999999996
+        ],
+        "received": 5192526.68836189,
+        "camera": "down",
+        "source": "logical_camera_oracle"
+      },
+      "obstacle_1": {
+        "position": [
+          3.6000000000000014,
+          2.35,
+          0.9999999999999998
+        ],
+        "received": 5192528.447657349,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "blue_platform": {
+        "position": [
+          7.600000000000001,
+          4.15,
+          0.25
+        ],
+        "received": 5192525.555860777,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "red_package": {
+        "position": [
+          6.213973413169884,
+          3.5751856775087294,
+          0.19856031910369498
+        ],
+        "received": 5192519.078273905,
+        "camera": "down",
+        "source": "learned_rgbd",
+        "stamp_ns": 63800000000,
+        "quality": {
+          "valid": true,
+          "position": [
+            6.213973413169884,
+            3.5751856775087294,
+            0.19856031910369498
+          ],
+          "surface_position": [
+            6.213973413169884,
+            3.5751856775087294,
+            0.318560319103695
+          ],
+          "valid_pixels": 895,
+          "top_surface_pixels": 62,
+          "surface_mad_m": [
+            0.02783911939241257,
+            6.478675694143732e-06,
+            0.00915254340832139
+          ],
+          "assumptions": [
+            "upright package",
+            "known package height",
+            "visible horizontal top"
+          ],
+          "source": "rgbd_geometry",
+          "uncertainty_calibrated": false
+        }
+      }
+    },
+    "gripper": "detached",
+    "gripper_received": 5192510.988527821,
+    "contacts": [],
+    "contact_received": 0.0,
+    "imu_received": 5192530.485120098,
+    "cameras": {
+      "front": {
+        "width": 256,
+        "height": 256,
+        "received": 5192530.387271265
+      },
+      "down": {
+        "width": 256,
+        "height": 256,
+        "received": 5192530.389279744
+      },
+      "external": {
+        "width": 256,
+        "height": 256,
+        "received": 5192530.391675432
+      }
+    },
+    "semantic_received": {
+      "down": 5192530.437097917,
+      "front": 5192530.43705544
+    },
+    "depth": {
+      "received": 5192530.395258937,
+      "center_median_m": 1.513704776763916,
+      "width": 256,
+      "height": 256
+    },
+    "sequence": 2085,
+    "package_perception": {
+      "schema_version": "1.0",
+      "frame": "map",
+      "source": "learned_rgbd",
+      "stamp_ns": 75000000000,
+      "pose_skew_ns": 12000000,
+      "inference_seconds": 0.05250978097319603,
+      "valid": false,
+      "estimate": {
+        "valid": false,
+        "reason": "INSUFFICIENT_VALID_DEPTH"
+      },
+      "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+      "received": 5192530.450960571
+    }
+  },
+  "facts": {
+    "found": true,
+    "inspected": {
+      "view_0": [
+        6.440202588655634,
+        1.298559520448672,
+        1.5998253233444362
+      ],
+      "view_1": [
+        7.421079027310282,
+        0.7268166278255116,
+        1.6029052333367744
+      ],
+      "view_2": [
+        7.441107771760754,
+        1.8574827529132893,
+        1.6027884774091632
+      ]
+    },
+    "holding": false,
+    "picked": true,
+    "placed": true,
+    "traversed": false,
+    "at_home": false,
+    "landed": false
+  }
+}

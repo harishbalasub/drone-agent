@@ -1,0 +1,34 @@
+{
+  "source": "gazebo_world_pose_evaluation_only",
+  "drone_pose": [
+    0.8503371397596379,
+    0.6498485273665887,
+    1.5751052247218897
+  ],
+  "package_pose": [
+    0.8511126406966388,
+    0.6502242423059041,
+    1.159594674878786
+  ],
+  "home_verified": true,
+  "placement_verified": false,
+  "samples": 2709,
+  "reported_outcome": "MISSION_ABORTED_SAFE_RETURN_COMPLETED",
+  "requested_views": 2,
+  "expected_outcome": "MISSION_ABORTED_SAFE_RETURN_COMPLETED",
+  "actual_outcome": "MISSION_ABORTED_SAFE_RETURN_COMPLETED",
+  "backend": "gazebo_native",
+  "scenario": 2,
+  "policy": "abort",
+  "observed_views": 2,
+  "collision": false,
+  "duration_seconds": 53.69644121918827,
+  "perception_mode": "logical_camera_oracle",
+  "controller": {
+    "kp": 1.1,
+    "max_speed": 0.65,
+    "tolerance": 0.09,
+    "settle_seconds": 0.6
+  },
+  "passed": true
+}
