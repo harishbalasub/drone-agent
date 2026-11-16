@@ -42,28 +42,19 @@ label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5
 <details><summary>External execution status and evidence</summary><pre id="externalStatus">Not connected.</pre></details>
 </div>
 </div></section>
-<section class="panel"><div class="panel-head"><h2>1. LLM + Mission</h2><span class="badge" id="compilerBadge">NOT RUN</span></div><div class="panel-body stack">
+<section class="panel"><div class="panel-head"><h2>LLM settings</h2></div><div class="panel-body stack">
 <div class="row"><div><label>LLM provider</label><select id="provider"><option value="openai">OpenAI (GPT API)</option><option value="gemini">Google Gemini</option></select></div><div><label>Model</label><input id="model" value="gpt-6-luna"/></div></div>
 <div><label>API key (prototype only — browser-side keys are not recommended for deployment)</label><input id="apiKey" type="password" autocomplete="off" placeholder="Leave blank to use local demo compiler"/></div>
 <div class="row"><label><input id="rememberApiKey" type="checkbox"/> Remember keys in this tab</label><button id="forgetApiKeys" class="btn" type="button">Forget keys</button></div>
 <div id="keyStorageStatus" class="small">Optional: keep keys for refreshes in this tab. Saved keys are accessible to this app's scripts; not a secure vault. Closing the tab normally clears them, but browser session restore may retain them. Use Forget keys on shared devices.</div>
 <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input id="fallbackDemo" type="checkbox" checked style="width:auto"/>Allow scripted local demo (not LLM planning) when no API key is supplied</label>
-<div><label>Mission goal</label><textarea id="mission">Find the red package, inspect it from two viewpoints, pick it up, fly through the gate, place it on the blue platform, and return home.</textarea></div>
+<div class="small">Enter and revise missions in the conversation. Robot execution starts only when you choose Run Mission.</div>
+</div></section>
+<section class="panel"><div class="panel-head"><h2>Mission status</h2></div><div class="panel-body stack">
+<div class="toolbar">Mission Spec <span class="badge" id="compilerBadge">NOT RUN</span></div>
+<div class="toolbar">Validation <span class="badge" id="validationBadge">NOT RUN</span></div>
+<div class="toolbar">Behavior Tree <span class="badge" id="planBadge">NOT READY</span></div>
 <div id="gatePolicySummary" class="note" hidden></div>
-<div class="row"><button class="btn primary" id="generateBtn">Generate Mission Spec</button><button class="btn" id="loadExampleBtn">Load Another Example</button></div>
-<div class="note">The LLM proposes the Mission Spec and Behavior Tree. It does <b>not</b> authorize execution or generate motor commands. For external execution, use the launcher in <code>ros2_sim</code>; its server also provides the local LLM proxy.</div>
-</div></section>
-
-<section class="panel"><div class="panel-head"><h2>2. Mission Validation</h2><span class="badge" id="validationBadge">NOT RUN</span></div><div class="panel-body stack">
-<button class="btn success" id="validateBtn" disabled>Validate Mission Spec</button>
-<div id="clarificationPanel" class="stack" hidden></div>
-<div class="small">Compiler checks below use the browser reference world and energy estimate. External execution additionally checks supported goals, ordering, fresh observations and runtime geometry in the gateway. Browser energy estimates do not certify external flight duration.</div>
-</div></section>
-
-<section class="panel"><div class="panel-head"><h2>3. Robot Plan</h2><span class="badge" id="planBadge">NOT READY</span></div><div class="panel-body stack">
-<div class="row"><button class="btn" id="pddlBtn" disabled>Generate PDDL (optional)</button><button class="btn primary" id="planBtn" disabled>Generate Behavior Tree</button></div>
-<button class="btn success" id="runBtn" disabled>Run Plan in Simulator</button>
-<div class="small">Generate the Behavior Tree directly from the validated Mission Spec. PDDL export is optional and is not used to generate or validate the tree. The prototype uses local policy recovery at runtime. Exported PDDL can later go to Fast Downward/pyperplan. Add: “If the gate is not clear, bypass or ask for human feedback” or “If the gate is blocked, ask me before bypassing.”</div>
 </div></section>
 
 <section class="panel"><div class="panel-head"><h2>Accountability Trace</h2><button class="btn" id="clearLogBtn">Clear</button></div><div class="log" id="eventLog"></div><div class="panel-body"><label>Save to project subdirectory</label><input id="saveDirectory" value="session_logs"/><button id="saveSessionBtn" class="btn">Save session logs and all versions</button><div id="saveStatus" class="small"></div><div id="versionHistory" class="small">No mission versions yet.</div></div></section>
@@ -73,11 +64,11 @@ label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5
 <section class="panel mission-chat" aria-label="Mission conversation">
 <div class="panel-head"><h2>Mission conversation</h2><span id="chatContext" class="chat-context">Ready for a mission</span></div>
 <div id="chatThread" class="chat-thread" role="log" aria-label="Mission messages" aria-live="polite" aria-relevant="additions"></div>
-<div class="chat-compose"><label for="chatInput">Message the mission agent</label><textarea id="chatInput" rows="2" placeholder="Describe a mission, clarify an assumption, or ask for status…"></textarea><div class="toolbar"><span id="chatHint" class="small">Review assumptions, resolve issues, and follow verified milestones.</span><button id="chatStatusBtn" class="btn">Status</button><button id="chatSendBtn" class="btn primary">Send</button></div></div>
+<div class="chat-compose"><label for="chatInput">Message the mission agent</label><textarea id="chatInput" rows="2" placeholder="Describe a mission, clarify an assumption, or ask for status…"></textarea><div class="toolbar"><span id="chatHint" class="small">Review assumptions, resolve issues, and follow verified milestones.</span><button id="chatDefaultBtn" class="btn">Default mission</button><button id="chatStatusBtn" class="btn">Status</button><button id="chatSendBtn" class="btn primary">Send</button></div></div>
 </section>
 <section class="panel">
 <div class="pipeline"><div class="pipe active" id="pipeMission">Mission</div><div class="pipe" id="pipeSpec">Spec</div><div class="pipe" id="pipeValidate">Validate</div><div class="pipe" id="pipePlan">Behavior Tree</div><div class="pipe" id="pipeExecute">Execute</div></div>
-<div class="panel-head"><h2>4. Drone Simulation</h2><div class="toolbar"><span class="badge" id="worldVersionBadge">WORLD v1</span><button class="btn" id="modeBtn">Mode: EDIT</button><button class="btn" id="observeBtn">Refresh Observation</button><button class="btn warn" id="resetWorldBtn">Reset World</button></div></div>
+<div class="panel-head"><h2>Drone Simulation</h2><div class="toolbar"><span class="badge" id="worldVersionBadge">WORLD v1</span><button class="btn" id="modeBtn">Mode: EDIT</button><button class="btn" id="observeBtn">Refresh Observation</button><button class="btn warn" id="resetWorldBtn">Reset World</button></div></div>
 <div class="panel-body">
 <div class="row"><div><label>World scenario</label><select id="scenario"><option value="1">Scenario 1 — gate clear</option><option value="2">Scenario 2 — gate blocked</option><option value="3">Scenario 3 — blue and red platforms</option></select></div><div><label>Execution status</label><span id="executionStatus" class="badge">IDLE</span></div></div>
 <div id="humanPanel" hidden class="note"><b>Gate blocked — human decision required</b><p>Approve bypassing the gate and continuing delivery, or abort and return home. No response within 30 seconds selects safe return.</p><button id="approveBypassBtn" class="btn success">Approve bypass</button> <button id="abortMissionBtn" class="btn warn">Abort and return home</button></div>
@@ -97,11 +88,19 @@ label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5
 <div id="worksheetTab" class="tab-content active"><pre id="worksheetOut" style="max-height:none"></pre></div>
 <div id="specTab" class="tab-content"><pre id="specOut">Generate a mission specification to begin.</pre></div>
 <div id="validationTab" class="tab-content"><div id="validationOut" class="validation-list"><div class="small">No validation results.</div></div></div>
-<div id="pddlTab" class="tab-content"><pre id="pddlOut">Optional PDDL export not generated.</pre></div>
+<div id="pddlTab" class="tab-content"><div class="panel-body"><button class="btn" id="pddlBtn" disabled>Generate PDDL (optional)</button><p class="small">Optional export from the validated Mission Spec; not required for Behavior Tree generation or execution.</p></div><pre id="pddlOut">Optional PDDL export not generated.</pre></div>
 <div id="planTab" class="tab-content"><pre id="planOut">Plan not generated.</pre></div>
 <div class="footer-note">Browser mode uses the original 2-D simulation. External mode shows a telemetry projection; Gazebo performs physics and the gateway verifies skill evidence.</div>
 </section>
 </div></div></main>
+
+
+<div id="missionController" hidden aria-hidden="true">
+<textarea id="mission">Find the red package, inspect it from two viewpoints, pick it up, fly through the gate, place it on the blue platform, and return home.</textarea>
+<button id="generateBtn" type="button">Generate Mission Spec</button><button id="loadExampleBtn" type="button">Load Another Example</button>
+<button id="validateBtn" type="button" disabled>Validate Mission Spec</button><button id="planBtn" type="button" disabled>Generate Behavior Tree</button><button id="runBtn" type="button" disabled>Run Mission</button>
+<div id="clarificationPanel" hidden></div>
+</div>
 
 <script>
 "use strict";
@@ -999,7 +998,7 @@ document.getElementById("saveSessionBtn").onclick=async()=>{
  }catch(e){status.textContent=e.message;log(e.message,"bad")}finally{button.disabled=false}
 };
 
-updateMode();updatePanels();refreshObservation("initialization");log("Browser build: bt-gate-policy-v3. Drag the world, compile a mission, validate, plan, and run.","good");requestAnimationFrame(draw);
+updateMode();updatePanels();refreshObservation("initialization");log("Chat-first build: edit the mission in chat and Send, then review, validate, plan, and run.","good");requestAnimationFrame(draw);
 </script>
 <script src="ros2_sim/chat.js"></script>
 <script src="ros2_sim/app.js"></script>

@@ -2,8 +2,9 @@
 (() => {
   'use strict';
   const el=id=>document.getElementById(id), thread=el('chatThread');
+  const defaultMission=el('mission').value;
   let busy=false, latestExternal=null, messageNumber=0, runNumber=0;
-  const seen=new Set();
+  const seen=new Set(), choices=[];
   // UI audit records remain separate from observed robot facts.
   const external=()=>el('executionBackend').value==='external';
   const stamp=()=>({revision:missionRevision,spec:JSON.stringify(missionSpec),scenario:el('scenario').value,backend:el('executionBackend').value});
@@ -26,15 +27,16 @@
       }box.appendChild(views);
     }
     if(actions.length){const bar=document.createElement('div');bar.className='chat-actions';
-      for(const action of actions){const button=document.createElement('button');button.className='btn'+(action.primary?' primary':'');button.textContent=action.label;button.type='button';
+      for(const action of actions){const button=document.createElement('button');button.className='btn'+(action.primary?' primary':'');button.textContent=action.label;button.type='button';choices.push({button,action});
         button.onclick=async()=>{
           if(busy||action.guard&&!action.guard()){card('This decision is no longer current','The mission or execution state changed. Use the latest card or ask for status.');return;}
           button.disabled=true;
-          try{await action.run();}catch(e){card('Could not apply action',e.message,{kind:'problem'});}finally{button.disabled=false;}
+          try{await action.run();}catch(e){card('Could not apply action',e.message,{kind:'problem'});}finally{button.disabled=!!(action.guard&&!action.guard());}
         };bar.appendChild(button);
       }box.appendChild(bar);
     }
     thread.appendChild(box);thread.scrollTop=thread.scrollHeight;
+    for(const choice of choices)if(choice.action.guard&&!choice.action.guard())choice.button.disabled=true;
     // Bound displayed history; the complete audit remains in the session export.
     while(thread.children.length>120)thread.removeChild(thread.firstElementChild);
     if(persist)audit('CHAT_MESSAGE',{id,kind,title,text:redactLog(text),evidence,frames,version});
@@ -151,9 +153,9 @@
     if(!validationResult){card('No validation result yet','Generate a Mission Spec, then validate it.');return;}
     card('Validation evidence',validationResult.checks.map(c=>c.status.toUpperCase()+' · '+c.name+': '+c.detail).join('\n'),{evidence:{mission_version:missionRevision,status:validationResult.status}});
   }
-  async function compileProposedMission(text,s){
+  async function compileProposedMission(text,s,autoValidate=true){
     if(running||!same(s))throw new Error('Mission changed. Submit the request again against the current mission.');
-    el('mission').value=text;await el('generateBtn').onclick();if(missionSpec)el('validateBtn').onclick();
+    el('mission').value=text;await el('generateBtn').onclick();if(missionSpec&&autoValidate)el('validateBtn').onclick();
   }
   const CHAT_SCHEMA={type:'object',additionalProperties:false,required:['intent','revised_mission','clarification'],properties:{intent:{type:'string',enum:['STATUS','EXPLAIN_VALIDATION','AMEND_MISSION','CLARIFY']},revised_mission:{type:'string'},clarification:{type:'string'}}};
   async function send(){
@@ -162,8 +164,15 @@
     if(/^(explain|why|validation|explain validation)[?.! ]*$/i.test(text)){explainValidation();return;}
     if(running){card('Mission is executing','You can request status or use the active human-decision card. Changes to the mission are accepted after execution stops; this chat does not modify a running flight plan.',{kind:'decision'});return;}
     const s=stamp(),key=el('apiKey').value.trim();
+    if(!missionSpec){
+      busy=true;el('chatSendBtn').disabled=true;el('chatHint').textContent='Preparing your mission…';
+      try{await compileProposedMission(text,s,false);}
+      catch(e){card('Could not prepare the mission',redactLog(e.message),{kind:'problem'});}
+      finally{busy=false;el('chatSendBtn').disabled=false;el('chatHint').textContent='Review assumptions, resolve issues, and follow verified milestones.';}
+      return;
+    }
     if(!key){
-      card('Review mission text',missionSpec?'Without an API key I cannot interpret an incremental edit. Enter the complete revised mission below or in the Mission goal field; applying this text uses the scripted demo compiler.':'Use this as the complete mission with the scripted demo compiler?',{kind:'decision',evidence:{proposed_mission:text},actions:[{label:'Use as complete mission',primary:true,guard:idleGuard(s),run:()=>compileProposedMission(text,s)}]});return;
+      card('Review mission text',missionSpec?'Without an API key I cannot interpret an incremental edit. Enter the complete revised mission below; applying this text uses the scripted demo compiler.':'Use this as the complete mission with the scripted demo compiler?',{kind:'decision',evidence:{proposed_mission:text},actions:[{label:'Use as complete mission',primary:true,guard:idleGuard(s),run:()=>compileProposedMission(text,s)}]});return;
     }
     busy=true;el('chatSendBtn').disabled=true;el('chatHint').textContent='Interpreting your request…';
     try{
@@ -230,6 +239,12 @@
   }
   globalThis.DroneChat={card,status,externalState,externalEvent,send,confirmAssumption,editAngle,addAngleReview,showReview};
   el('chatSendBtn').onclick=send;el('chatStatusBtn').onclick=status;
+  el('chatInput').value=defaultMission;
+  el('chatDefaultBtn').onclick=()=>{
+    if(busy||running){card('Mission is busy','Wait for the current operation to finish before preparing another mission.');return;}
+    el('chatInput').value=defaultMission;el('chatInput').focus();
+    el('chatHint').textContent='Default mission loaded. Edit it if needed, then Send.';
+  };
   el('chatInput').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send();}};
-  card('Mission agent ready','Describe a mission or use the Mission goal field. I will surface assumptions and validation issues here, then report verified milestones with available images. Robot execution starts only when you choose Run.',{persist:false});
+  card('Mission agent ready','The default mission is ready below. Edit it if needed, then Send. I will guide you through assumption review, validation, Behavior Tree generation and Run Mission here.',{persist:false});
 })();

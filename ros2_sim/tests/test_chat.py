@@ -40,13 +40,15 @@ if(missionSpec.assumptions.some(a=>a.constraint_name==='minimum_view_separation_
 ''')
     def test_confirmation_milestones_and_reset(self):
         self.run_case('''
-log=()=>{};sleep=async()=>{};animate=async d=>{world.drone.x=d.x;world.drone.y=d.y;if(verifiedState.holding){world.target.x=d.x+24;world.target.y=d.y+20}};
-await document.getElementById('generateBtn').onclick();await action('Accept assumption').onclick();
+const defaultGoal=document.getElementById('mission').value;log=()=>{};sleep=async()=>{};animate=async d=>{world.drone.x=d.x;world.drone.y=d.y;if(verifiedState.holding){world.target.x=d.x+24;world.target.y=d.y+20}};
+if(document.getElementById('chatInput').value!==document.getElementById('mission').value)throw new Error('Default mission not loaded in chat');
+await document.getElementById('chatSendBtn').onclick();await action('Accept assumption').onclick();
 if(validationResult.status!=='ACCEPTED'||!missionSpec.user_confirmed_assumptions.length)throw new Error('Assumption confirm failed');
-await document.getElementById('planBtn').onclick();await document.getElementById('runBtn').onclick();
+await action('Generate Behavior Tree').onclick();await action('Run mission').onclick();
 for(const title of ['Package located','Package picked up','Gate traversed','Package placed','Returned home','Mission completed'])if(!session.events.some(e=>e.message_type==='CHAT_MESSAGE'&&e.title===title))throw new Error('Missing '+title);
 const picked=session.events.find(e=>e.title==='Package picked up');if(picked.frames.length!==2||!picked.frames[0].label.includes('not a camera')||!picked.evidence.facts.holding)throw new Error('Wrong milestone evidence');
 document.getElementById('resetWorldBtn').onclick();if(!robotBehaviorTree||document.getElementById('runBtn').disabled)throw new Error('Chat broke reuse');
+document.getElementById('chatInput').value='An edit';document.getElementById('chatDefaultBtn').onclick();if(document.getElementById('chatInput').value!==defaultGoal)throw new Error('Default mission restore failed');
 ''')
     def test_llm_chat_proposes_before_applying_and_blocks_inflight_edits(self):
         self.run_case('''
