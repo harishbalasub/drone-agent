@@ -1,0 +1,3007 @@
+{
+  "schema_version": "1.0",
+  "scenario": 1,
+  "transport": "ros2",
+  "connected": true,
+  "runtime_contract": {
+    "action": {
+      "skill": "RETURN_HOME",
+      "args": []
+    },
+    "status": "SUCCEEDED",
+    "reason": null,
+    "checks": [
+      {
+        "name": "Fresh odometry",
+        "status": "pass",
+        "detail": "Age 0.03 s; limit 1.5 s"
+      },
+      {
+        "name": "Inside geofence",
+        "status": "pass",
+        "detail": "Current measured drone position"
+      },
+      {
+        "name": "No recorded collision",
+        "status": "pass",
+        "detail": "Session collision monitor"
+      },
+      {
+        "name": "Battery reserve",
+        "status": "unknown",
+        "detail": "No battery sensor/model in this Gazebo world; reserve is not verified"
+      },
+      {
+        "name": "At home hover position",
+        "status": "pass",
+        "detail": "Home target: [0.85, 0.65, 1.6] m; no touchdown commanded"
+      }
+    ],
+    "checks_scope": "Current telemetry; skill success is taken only from ACTION_RESULT",
+    "completion_behavior": "Return home holds at 1.6 m; landing is not commissioned."
+  },
+  "battery": {
+    "available": false,
+    "percent": null,
+    "source": "not_modeled",
+    "reserve_verified": false
+  },
+  "completion_behavior": "Hover at home at 1.6 m. LAND is not commissioned.",
+  "status": "MISSION_COMPLETED",
+  "run_id": "db6e1ea455784326a4738faf67896078",
+  "active": false,
+  "sensors": {
+    "position": [
+      0.8519498554403139,
+      0.6494663110779735,
+      1.603472064356044
+    ],
+    "velocity": [
+      -0.0008554479018677456,
+      -6.394973700479088e-05,
+      -1.324272639361282e-05
+    ],
+    "yaw": 1.5707726122844539,
+    "pose_received": 5411141.473293436,
+    "objects": {
+      "gate_left": {
+        "position": [
+          4.899999999999999,
+          3.650000000000001,
+          1.25
+        ],
+        "received": 5411123.851861794,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "gate_right": {
+        "position": [
+          6.1999999999999975,
+          3.649999999999999,
+          1.25
+        ],
+        "received": 5411123.851861794,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "gate_top": {
+        "position": [
+          5.549999999999999,
+          3.65,
+          2.5
+        ],
+        "received": 5411118.657241469,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "ground": {
+        "position": [
+          4.500000000000001,
+          2.5999999999999996,
+          -0.05000000000000049
+        ],
+        "received": 5411135.594911727,
+        "camera": "down",
+        "source": "logical_camera_oracle"
+      },
+      "obstacle_1": {
+        "position": [
+          3.6000000000000005,
+          2.35,
+          1.0
+        ],
+        "received": 5411105.524491663,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "home": {
+        "position": [
+          0.8500000000000001,
+          0.6500000000000001,
+          0.0050000000000001155
+        ],
+        "received": 5411141.48211181,
+        "camera": "down",
+        "source": "logical_camera_oracle"
+      },
+      "blue_platform": {
+        "position": [
+          7.599999999999998,
+          4.150000000000001,
+          0.2500000000000002
+        ],
+        "received": 5411118.450949914,
+        "camera": "front",
+        "source": "logical_camera_oracle"
+      },
+      "red_package": {
+        "position": [
+          4.838189047480572,
+          3.6139199380727463,
+          0.6531210661437822
+        ],
+        "received": 5411130.704931956,
+        "camera": "down",
+        "source": "learned_rgbd",
+        "stamp_ns": 46400000000,
+        "quality": {
+          "valid": true,
+          "position": [
+            4.838189047480572,
+            3.6139199380727463,
+            0.6531210661437822
+          ],
+          "surface_position": [
+            4.838189047480572,
+            3.6139199380727463,
+            0.7731210661437822
+          ],
+          "valid_pixels": 306,
+          "top_surface_pixels": 43,
+          "surface_mad_m": [
+            2.3420811823271492e-06,
+            0.011953469376542625,
+            0.007072976348243887
+          ],
+          "assumptions": [
+            "upright package",
+            "known package height",
+            "visible horizontal top"
+          ],
+          "source": "rgbd_geometry",
+          "uncertainty_calibrated": false
+        }
+      }
+    },
+    "gripper": "detached",
+    "gripper_received": 5411098.04991541,
+    "contacts": [],
+    "contact_received": 0.0,
+    "imu_received": 5411141.493368325,
+    "cameras": {
+      "front": {
+        "width": 256,
+        "height": 256,
+        "received": 5411141.325708788
+      },
+      "down": {
+        "width": 256,
+        "height": 256,
+        "received": 5411141.328251181
+      },
+      "external": {
+        "width": 256,
+        "height": 256,
+        "received": 5411141.331768383
+      }
+    },
+    "semantic_received": {
+      "front": 5411141.48218573,
+      "down": 5411141.48211181
+    },
+    "depth": {
+      "received": 5411141.33318959,
+      "center_median_m": 1.5134717226028442,
+      "width": 256,
+      "height": 256
+    },
+    "sequence": 1582,
+    "package_perception": {
+      "schema_version": "1.0",
+      "frame": "map",
+      "source": "learned_rgbd",
+      "stamp_ns": 56800000000,
+      "pose_skew_ns": 8000000,
+      "inference_seconds": 0.045060151256620884,
+      "valid": false,
+      "estimate": {
+        "valid": false,
+        "reason": "INSUFFICIENT_VALID_DEPTH"
+      },
+      "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+      "received": 5411141.384070762
+    }
+  },
+  "reset_supported": true,
+  "pose_age_seconds": 0.02609307784587145,
+  "perception_mode": "learned_rgbd_package; logical_camera_scene",
+  "pose_source": "simulated_motion_capture",
+  "facts": {
+    "found": true,
+    "inspected": {},
+    "holding": false,
+    "picked": false,
+    "placed": false,
+    "traversed": true,
+    "at_home": true,
+    "landed": false
+  },
+  "session": {
+    "session_id": "db6e1ea455784326a4738faf67896078",
+    "started_at": "2026-11-16T06:52:42.191097+00:00",
+    "backend": "ros2",
+    "perception_mode": "learned_rgbd_package; logical_camera_scene",
+    "events": [
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:46.145881+00:00",
+        "node_path": "root",
+        "node_type": "Sequence",
+        "status": "RUNNING",
+        "sequence": 1
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:46.146546+00:00",
+        "node_path": "root.0",
+        "node_type": "Action",
+        "status": "RUNNING",
+        "sequence": 2
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "ACTION_STARTED",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:46.146596+00:00",
+        "action": {
+          "skill": "SEARCH",
+          "args": [
+            "red_package"
+          ]
+        },
+        "sequence": 3
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "OBSERVATION",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:56.771769+00:00",
+        "object_id": "red_package",
+        "pose": [
+          7.090330729838844,
+          1.2982226235800536,
+          0.12054789144590583
+        ],
+        "source": "learned_rgbd",
+        "sequence": 4
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "ACTION_RESULT",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:56.802722+00:00",
+        "action": {
+          "skill": "SEARCH",
+          "args": [
+            "red_package"
+          ]
+        },
+        "result": "SUCCEEDED",
+        "facts": {
+          "found": true,
+          "inspected": {},
+          "holding": false,
+          "picked": false,
+          "placed": false,
+          "traversed": false,
+          "at_home": false,
+          "landed": false
+        },
+        "status": {
+          "position": [
+            6.299801462523317,
+            1.0011268670031714,
+            1.6041290711092449
+          ],
+          "velocity": [
+            0.02055017624156822,
+            -0.0014449233767109427,
+            -0.004270573439713035
+          ],
+          "yaw": 6.953598367150819e-06,
+          "pose_received": 5411112.711878086,
+          "objects": {
+            "gate_left": {
+              "position": [
+                4.9,
+                3.65,
+                1.25
+              ],
+              "received": 5411105.990975149,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_right": {
+              "position": [
+                6.2,
+                3.6500000000000004,
+                1.2500000000000002
+              ],
+              "received": 5411108.200409711,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_top": {
+              "position": [
+                5.549999999999999,
+                3.6500000000000004,
+                2.5000000000000004
+              ],
+              "received": 5411107.057923626,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "ground": {
+              "position": [
+                4.500000000000002,
+                2.6,
+                -0.049999999999999156
+              ],
+              "received": 5411112.689113058,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "obstacle_1": {
+              "position": [
+                3.6000000000000005,
+                2.35,
+                1.0
+              ],
+              "received": 5411105.524491663,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "home": {
+              "position": [
+                0.8499999999999992,
+                0.6500000000000001,
+                0.004999999999998783
+              ],
+              "received": 5411105.990889761,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "blue_platform": {
+              "position": [
+                7.6,
+                4.150000000000002,
+                0.25
+              ],
+              "received": 5411109.872616115,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "red_package": {
+              "position": [
+                7.090330729838844,
+                1.2982226235800536,
+                0.12054789144590583
+              ],
+              "received": 5411112.587895118,
+              "camera": "down",
+              "source": "learned_rgbd",
+              "stamp_ns": 28600000000,
+              "quality": {
+                "valid": true,
+                "position": [
+                  7.090330729838844,
+                  1.2982226235800536,
+                  0.12054789144590583
+                ],
+                "surface_position": [
+                  7.090330729838844,
+                  1.2982226235800536,
+                  0.24054789144590583
+                ],
+                "valid_pixels": 982,
+                "top_surface_pixels": 549,
+                "surface_mad_m": [
+                  0.04666587466113814,
+                  0.04604245153896791,
+                  2.9213664400229433e-05
+                ],
+                "assumptions": [
+                  "upright package",
+                  "known package height",
+                  "visible horizontal top"
+                ],
+                "source": "rgbd_geometry",
+                "uncertainty_calibrated": false
+              }
+            }
+          },
+          "gripper": "detached",
+          "gripper_received": 5411098.04991541,
+          "contacts": [],
+          "contact_received": 0.0,
+          "imu_received": 5411112.726034137,
+          "cameras": {
+            "front": {
+              "width": 256,
+              "height": 256,
+              "received": 5411112.716070635
+            },
+            "down": {
+              "width": 256,
+              "height": 256,
+              "received": 5411112.720163365
+            },
+            "external": {
+              "width": 256,
+              "height": 256,
+              "received": 5411112.723017088
+            }
+          },
+          "semantic_received": {
+            "front": 5411112.688255541,
+            "down": 5411112.689113058
+          },
+          "depth": {
+            "received": 5411112.72508233,
+            "center_median_m": 1.524156093597412,
+            "width": 256,
+            "height": 256
+          },
+          "sequence": 800,
+          "package_perception": {
+            "schema_version": "1.0",
+            "frame": "map",
+            "source": "learned_rgbd",
+            "stamp_ns": 28600000000,
+            "pose_skew_ns": 16000000,
+            "inference_seconds": 0.04828561283648014,
+            "valid": true,
+            "estimate": {
+              "valid": true,
+              "position": [
+                7.090330729838844,
+                1.2982226235800536,
+                0.12054789144590583
+              ],
+              "surface_position": [
+                7.090330729838844,
+                1.2982226235800536,
+                0.24054789144590583
+              ],
+              "valid_pixels": 982,
+              "top_surface_pixels": 549,
+              "surface_mad_m": [
+                0.04666587466113814,
+                0.04604245153896791,
+                2.9213664400229433e-05
+              ],
+              "assumptions": [
+                "upright package",
+                "known package height",
+                "visible horizontal top"
+              ],
+              "source": "rgbd_geometry",
+              "uncertainty_calibrated": false
+            },
+            "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+            "received": 5411112.587890796
+          }
+        },
+        "camera_evidence": [
+          {
+            "camera": "front",
+            "label": "ROS2 forward camera",
+            "source": "event_time_ros2_camera",
+            "age_seconds": 0.013,
+            "captured_at": "2026-11-16T06:52:56.759362+00:00",
+            "data_url": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAsICAoIBwsKCQoNDAsNERwSEQ8PESIZGhQcKSQrKigkJyctMkA3LTA9MCcnOEw5PUNFSElIKzZPVU5GVEBHSEX/2wBDAQwNDREPESESEiFFLicuRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUX/wAARCACgAKADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0GiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAoqDzm9BR5zegoAnoqHzm9BR5zegoAmoqHzm9BR5zegoAmoqHzm9BR5zegoAmoqHzm9BR5zegoAmoqHzm9BR5zegoAmoqHzm9BSec3oKAJ6Kg85vQUec3oKAJ6Kg85vQUee3oKAJ6Kg89vQUonOfmHHtQBHRRRTEFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABSUtFACUUtFABRRS0AJRS0UAJRS0UAJRS0UAJRS0UAJRS0UAJRS0UAJRRRQAUUUUAFFFFAH//Z"
+          },
+          {
+            "camera": "down",
+            "label": "ROS2 downward camera",
+            "source": "event_time_ros2_camera",
+            "age_seconds": 0.008,
+            "captured_at": "2026-11-16T06:52:56.763455+00:00",
+            "data_url": "data:image/jpeg;base64,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"
+          }
+        ],
+        "sequence": 5
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:56.803020+00:00",
+        "node_path": "root.0",
+        "node_type": "Action",
+        "status": "SUCCESS",
+        "sequence": 6
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:56.803072+00:00",
+        "node_path": "root.1",
+        "node_type": "Action",
+        "status": "RUNNING",
+        "sequence": 7
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "ACTION_STARTED",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:56.803109+00:00",
+        "action": {
+          "skill": "NAVIGATE",
+          "args": [
+            "target_loc"
+          ]
+        },
+        "sequence": 8
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "ACTION_RESULT",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:59.536767+00:00",
+        "action": {
+          "skill": "NAVIGATE",
+          "args": [
+            "target_loc"
+          ]
+        },
+        "result": "SUCCEEDED",
+        "facts": {
+          "found": true,
+          "inspected": {},
+          "holding": false,
+          "picked": false,
+          "placed": false,
+          "traversed": false,
+          "at_home": false,
+          "landed": false
+        },
+        "status": {
+          "position": [
+            7.090346877198559,
+            1.2986393357579986,
+            1.6011109263475725
+          ],
+          "velocity": [
+            0.018415200477812317,
+            -0.003415105368106209,
+            0.003244952743241593
+          ],
+          "yaw": 6.359466152492513e-05,
+          "pose_received": 5411115.489086728,
+          "objects": {
+            "gate_left": {
+              "position": [
+                4.9,
+                3.65,
+                1.25
+              ],
+              "received": 5411105.990975149,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_right": {
+              "position": [
+                6.2,
+                3.6500000000000004,
+                1.2500000000000002
+              ],
+              "received": 5411108.200409711,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_top": {
+              "position": [
+                5.549999999999999,
+                3.6500000000000004,
+                2.5000000000000004
+              ],
+              "received": 5411107.057923626,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "ground": {
+              "position": [
+                4.500000000000001,
+                2.6000000000000005,
+                -0.050000000000000044
+              ],
+              "received": 5411113.841225499,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "obstacle_1": {
+              "position": [
+                3.6000000000000005,
+                2.35,
+                1.0
+              ],
+              "received": 5411105.524491663,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "home": {
+              "position": [
+                0.8499999999999992,
+                0.6500000000000001,
+                0.004999999999998783
+              ],
+              "received": 5411105.990889761,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "blue_platform": {
+              "position": [
+                7.6,
+                4.150000000000002,
+                0.25
+              ],
+              "received": 5411109.872616115,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "red_package": {
+              "position": [
+                7.093477840648976,
+                1.2959456131220746,
+                0.11995643855548399
+              ],
+              "received": 5411115.415309921,
+              "camera": "down",
+              "source": "learned_rgbd",
+              "stamp_ns": 31400000000,
+              "quality": {
+                "valid": true,
+                "position": [
+                  7.093477840648976,
+                  1.2959456131220746,
+                  0.11995643855548399
+                ],
+                "surface_position": [
+                  7.093477840648976,
+                  1.2959456131220746,
+                  0.239956438555484
+                ],
+                "valid_pixels": 311,
+                "top_surface_pixels": 311,
+                "surface_mad_m": [
+                  0.030431196823266227,
+                  0.030410668770949778,
+                  9.136149557775752e-06
+                ],
+                "assumptions": [
+                  "upright package",
+                  "known package height",
+                  "visible horizontal top"
+                ],
+                "source": "rgbd_geometry",
+                "uncertainty_calibrated": false
+              }
+            }
+          },
+          "gripper": "detached",
+          "gripper_received": 5411098.04991541,
+          "contacts": [],
+          "contact_received": 0.0,
+          "imu_received": 5411115.492743238,
+          "cameras": {
+            "front": {
+              "width": 256,
+              "height": 256,
+              "received": 5411115.357191441
+            },
+            "down": {
+              "width": 256,
+              "height": 256,
+              "received": 5411115.360284631
+            },
+            "external": {
+              "width": 256,
+              "height": 256,
+              "received": 5411115.363197294
+            }
+          },
+          "semantic_received": {
+            "front": 5411115.437350667,
+            "down": 5411115.437756208
+          },
+          "depth": {
+            "received": 5411115.364034259,
+            "center_median_m": 1.280598759651184,
+            "width": 256,
+            "height": 256
+          },
+          "sequence": 876,
+          "package_perception": {
+            "schema_version": "1.0",
+            "frame": "map",
+            "source": "learned_rgbd",
+            "stamp_ns": 31400000000,
+            "pose_skew_ns": 8000000,
+            "inference_seconds": 0.04073269385844469,
+            "valid": true,
+            "estimate": {
+              "valid": true,
+              "position": [
+                7.093477840648976,
+                1.2959456131220746,
+                0.11995643855548399
+              ],
+              "surface_position": [
+                7.093477840648976,
+                1.2959456131220746,
+                0.239956438555484
+              ],
+              "valid_pixels": 311,
+              "top_surface_pixels": 311,
+              "surface_mad_m": [
+                0.030431196823266227,
+                0.030410668770949778,
+                9.136149557775752e-06
+              ],
+              "assumptions": [
+                "upright package",
+                "known package height",
+                "visible horizontal top"
+              ],
+              "source": "rgbd_geometry",
+              "uncertainty_calibrated": false
+            },
+            "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+            "received": 5411115.415303073
+          }
+        },
+        "sequence": 9
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:59.536935+00:00",
+        "node_path": "root.1",
+        "node_type": "Action",
+        "status": "SUCCESS",
+        "sequence": 10
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:59.536968+00:00",
+        "node_path": "root.2",
+        "node_type": "Fallback",
+        "status": "RUNNING",
+        "sequence": 11
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:59.536995+00:00",
+        "node_path": "root.2.0",
+        "node_type": "Sequence",
+        "status": "RUNNING",
+        "sequence": 12
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:59.537018+00:00",
+        "node_path": "root.2.0.0",
+        "node_type": "Condition",
+        "status": "RUNNING",
+        "sequence": 13
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "GATE_SURVEY_STARTED",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:52:59.537040+00:00",
+        "survey_pose": [
+          5.55,
+          2.8,
+          1.6
+        ],
+        "sequence": 14
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "GATE_SURVEY_RESULT",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:04.299697+00:00",
+        "gate_clear": true,
+        "status": {
+          "position": [
+            5.550879796371514,
+            2.801027879878272,
+            1.6059693892056055
+          ],
+          "velocity": [
+            -0.0024867034949303053,
+            -0.0018740689436849453,
+            0.00033493934131082175
+          ],
+          "yaw": 1.5724339496396575,
+          "pose_received": 5411120.229264764,
+          "objects": {
+            "gate_left": {
+              "position": [
+                4.9,
+                3.6500000000000004,
+                1.2500000000000002
+              ],
+              "received": 5411120.254105229,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_right": {
+              "position": [
+                6.2,
+                3.65,
+                1.2500000000000002
+              ],
+              "received": 5411120.254105229,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_top": {
+              "position": [
+                5.549999999999999,
+                3.65,
+                2.5
+              ],
+              "received": 5411118.657241469,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "ground": {
+              "position": [
+                4.499999999999999,
+                2.5999999999999996,
+                -0.050000000000001155
+              ],
+              "received": 5411120.25397377,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "obstacle_1": {
+              "position": [
+                3.6000000000000005,
+                2.35,
+                1.0
+              ],
+              "received": 5411105.524491663,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "home": {
+              "position": [
+                0.8499999999999992,
+                0.6500000000000001,
+                0.004999999999998783
+              ],
+              "received": 5411105.990889761,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "blue_platform": {
+              "position": [
+                7.599999999999998,
+                4.150000000000001,
+                0.2500000000000002
+              ],
+              "received": 5411118.450949914,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "red_package": {
+              "position": [
+                7.159292638564754,
+                1.3645288601541297,
+                0.12013147886709286
+              ],
+              "received": 5411116.837587583,
+              "camera": "down",
+              "source": "learned_rgbd",
+              "stamp_ns": 32800000000,
+              "quality": {
+                "valid": true,
+                "position": [
+                  7.159292638564754,
+                  1.3645288601541297,
+                  0.12013147886709286
+                ],
+                "surface_position": [
+                  7.159292638564754,
+                  1.3645288601541297,
+                  0.24013147886709285
+                ],
+                "valid_pixels": 275,
+                "top_surface_pixels": 90,
+                "surface_mad_m": [
+                  0.019245500366468882,
+                  0.016058968421512998,
+                  4.896369006135437e-06
+                ],
+                "assumptions": [
+                  "upright package",
+                  "known package height",
+                  "visible horizontal top"
+                ],
+                "source": "rgbd_geometry",
+                "uncertainty_calibrated": false
+              }
+            }
+          },
+          "gripper": "detached",
+          "gripper_received": 5411098.04991541,
+          "contacts": [],
+          "contact_received": 0.0,
+          "imu_received": 5411120.244399479,
+          "cameras": {
+            "front": {
+              "width": 256,
+              "height": 256,
+              "received": 5411120.095525435
+            },
+            "down": {
+              "width": 256,
+              "height": 256,
+              "received": 5411120.099832075
+            },
+            "external": {
+              "width": 256,
+              "height": 256,
+              "received": 5411120.107277157
+            }
+          },
+          "semantic_received": {
+            "front": 5411120.254105229,
+            "down": 5411120.25397377
+          },
+          "depth": {
+            "received": 5411120.109548771,
+            "center_median_m": 1.5259888172149658,
+            "width": 256,
+            "height": 256
+          },
+          "sequence": 1004,
+          "package_perception": {
+            "schema_version": "1.0",
+            "frame": "map",
+            "source": "learned_rgbd",
+            "stamp_ns": 36000000000,
+            "pose_skew_ns": 0,
+            "inference_seconds": 0.0747576067224145,
+            "valid": false,
+            "estimate": {
+              "valid": false,
+              "reason": "UNSUPPORTED_PACKAGE_SUPPORT_HEIGHT"
+            },
+            "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+            "received": 5411120.198316987
+          }
+        },
+        "sequence": 15
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:04.299945+00:00",
+        "node_path": "root.2.0.0",
+        "node_type": "Condition",
+        "status": "SUCCESS",
+        "sequence": 16
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:04.300008+00:00",
+        "node_path": "root.2.0.1",
+        "node_type": "Action",
+        "status": "RUNNING",
+        "sequence": 17
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "ACTION_STARTED",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:04.300060+00:00",
+        "action": {
+          "skill": "TRAVERSE_GATE",
+          "args": [
+            "gate_1"
+          ]
+        },
+        "sequence": 18
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "GATE_SURVEY_STARTED",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:04.300113+00:00",
+        "survey_pose": [
+          5.55,
+          2.8,
+          1.6
+        ],
+        "sequence": 19
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "GATE_SURVEY_RESULT",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:05.520998+00:00",
+        "gate_clear": true,
+        "status": {
+          "position": [
+            5.55007426233046,
+            2.7996929168410336,
+            1.60312418893123
+          ],
+          "velocity": [
+            0.00015734023978581312,
+            -9.055159248813762e-05,
+            0.00029204400648217513
+          ],
+          "yaw": 1.5707734362190586,
+          "pose_received": 5411121.461278924,
+          "objects": {
+            "gate_left": {
+              "position": [
+                4.899999999999999,
+                3.649999999999999,
+                1.25
+              ],
+              "received": 5411121.449663502,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_right": {
+              "position": [
+                6.199999999999998,
+                3.6499999999999995,
+                1.25
+              ],
+              "received": 5411121.449663502,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_top": {
+              "position": [
+                5.549999999999999,
+                3.65,
+                2.5
+              ],
+              "received": 5411118.657241469,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "ground": {
+              "position": [
+                4.500000000000001,
+                2.5999999999999996,
+                -0.04999999999999871
+              ],
+              "received": 5411121.450244478,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "obstacle_1": {
+              "position": [
+                3.6000000000000005,
+                2.35,
+                1.0
+              ],
+              "received": 5411105.524491663,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "home": {
+              "position": [
+                0.8499999999999992,
+                0.6500000000000001,
+                0.004999999999998783
+              ],
+              "received": 5411105.990889761,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "blue_platform": {
+              "position": [
+                7.599999999999998,
+                4.150000000000001,
+                0.2500000000000002
+              ],
+              "received": 5411118.450949914,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "red_package": {
+              "position": [
+                7.159292638564754,
+                1.3645288601541297,
+                0.12013147886709286
+              ],
+              "received": 5411116.837587583,
+              "camera": "down",
+              "source": "learned_rgbd",
+              "stamp_ns": 32800000000,
+              "quality": {
+                "valid": true,
+                "position": [
+                  7.159292638564754,
+                  1.3645288601541297,
+                  0.12013147886709286
+                ],
+                "surface_position": [
+                  7.159292638564754,
+                  1.3645288601541297,
+                  0.24013147886709285
+                ],
+                "valid_pixels": 275,
+                "top_surface_pixels": 90,
+                "surface_mad_m": [
+                  0.019245500366468882,
+                  0.016058968421512998,
+                  4.896369006135437e-06
+                ],
+                "assumptions": [
+                  "upright package",
+                  "known package height",
+                  "visible horizontal top"
+                ],
+                "source": "rgbd_geometry",
+                "uncertainty_calibrated": false
+              }
+            }
+          },
+          "gripper": "detached",
+          "gripper_received": 5411098.04991541,
+          "contacts": [],
+          "contact_received": 0.0,
+          "imu_received": 5411121.472965683,
+          "cameras": {
+            "front": {
+              "width": 256,
+              "height": 256,
+              "received": 5411121.297577117
+            },
+            "down": {
+              "width": 256,
+              "height": 256,
+              "received": 5411121.301156249
+            },
+            "external": {
+              "width": 256,
+              "height": 256,
+              "received": 5411121.304179378
+            }
+          },
+          "semantic_received": {
+            "front": 5411121.449663502,
+            "down": 5411121.450244478
+          },
+          "depth": {
+            "received": 5411121.305701114,
+            "center_median_m": 1.5231202840805054,
+            "width": 256,
+            "height": 256
+          },
+          "sequence": 1038,
+          "package_perception": {
+            "schema_version": "1.0",
+            "frame": "map",
+            "source": "learned_rgbd",
+            "stamp_ns": 37200000000,
+            "pose_skew_ns": 12000000,
+            "inference_seconds": 0.041739375330507755,
+            "valid": false,
+            "estimate": {
+              "valid": false,
+              "reason": "UNSUPPORTED_PACKAGE_SUPPORT_HEIGHT"
+            },
+            "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+            "received": 5411121.352152231
+          }
+        },
+        "sequence": 20
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "TRAVERSAL_EVIDENCE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:10.780653+00:00",
+        "before": [
+          5.549750827483564,
+          2.928056007713754,
+          1.600873222909257
+        ],
+        "after": [
+          5.548933107273404,
+          4.349845807334448,
+          1.6041057974458408
+        ],
+        "sequence": 21
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "ACTION_RESULT",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:10.784919+00:00",
+        "action": {
+          "skill": "TRAVERSE_GATE",
+          "args": [
+            "gate_1"
+          ]
+        },
+        "result": "SUCCEEDED",
+        "facts": {
+          "found": true,
+          "inspected": {},
+          "holding": false,
+          "picked": false,
+          "placed": false,
+          "traversed": true,
+          "at_home": false,
+          "landed": false
+        },
+        "status": {
+          "position": [
+            5.548933107273404,
+            4.349845807334448,
+            1.6041057974458408
+          ],
+          "velocity": [
+            0.018417411252718008,
+            -0.0014302710744844768,
+            -0.003976781563292566
+          ],
+          "yaw": 1.570802400191245,
+          "pose_received": 5411126.71939303,
+          "objects": {
+            "gate_left": {
+              "position": [
+                4.899999999999999,
+                3.650000000000001,
+                1.25
+              ],
+              "received": 5411123.851861794,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_right": {
+              "position": [
+                6.1999999999999975,
+                3.649999999999999,
+                1.25
+              ],
+              "received": 5411123.851861794,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_top": {
+              "position": [
+                5.549999999999999,
+                3.65,
+                2.5
+              ],
+              "received": 5411118.657241469,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "ground": {
+              "position": [
+                4.499999999999999,
+                2.599999999999999,
+                -0.050000000000000266
+              ],
+              "received": 5411126.670597907,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "obstacle_1": {
+              "position": [
+                3.6000000000000005,
+                2.35,
+                1.0
+              ],
+              "received": 5411105.524491663,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "home": {
+              "position": [
+                0.8499999999999992,
+                0.6500000000000001,
+                0.004999999999998783
+              ],
+              "received": 5411105.990889761,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "blue_platform": {
+              "position": [
+                7.599999999999998,
+                4.150000000000001,
+                0.2500000000000002
+              ],
+              "received": 5411118.450949914,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "red_package": {
+              "position": [
+                7.159292638564754,
+                1.3645288601541297,
+                0.12013147886709286
+              ],
+              "received": 5411116.837587583,
+              "camera": "down",
+              "source": "learned_rgbd",
+              "stamp_ns": 32800000000,
+              "quality": {
+                "valid": true,
+                "position": [
+                  7.159292638564754,
+                  1.3645288601541297,
+                  0.12013147886709286
+                ],
+                "surface_position": [
+                  7.159292638564754,
+                  1.3645288601541297,
+                  0.24013147886709285
+                ],
+                "valid_pixels": 275,
+                "top_surface_pixels": 90,
+                "surface_mad_m": [
+                  0.019245500366468882,
+                  0.016058968421512998,
+                  4.896369006135437e-06
+                ],
+                "assumptions": [
+                  "upright package",
+                  "known package height",
+                  "visible horizontal top"
+                ],
+                "source": "rgbd_geometry",
+                "uncertainty_calibrated": false
+              }
+            }
+          },
+          "gripper": "detached",
+          "gripper_received": 5411098.04991541,
+          "contacts": [],
+          "contact_received": 0.0,
+          "imu_received": 5411126.727306132,
+          "cameras": {
+            "front": {
+              "width": 256,
+              "height": 256,
+              "received": 5411126.566941267
+            },
+            "down": {
+              "width": 256,
+              "height": 256,
+              "received": 5411126.569035503
+            },
+            "external": {
+              "width": 256,
+              "height": 256,
+              "received": 5411126.571696939
+            }
+          },
+          "semantic_received": {
+            "front": 5411126.670227527,
+            "down": 5411126.670597907
+          },
+          "depth": {
+            "received": 5411126.572958397,
+            "center_median_m": 1.5247161388397217,
+            "width": 256,
+            "height": 256
+          },
+          "sequence": 1182,
+          "package_perception": {
+            "schema_version": "1.0",
+            "frame": "map",
+            "source": "learned_rgbd",
+            "stamp_ns": 42400000000,
+            "pose_skew_ns": 8000000,
+            "inference_seconds": 0.0446864003315568,
+            "valid": false,
+            "estimate": {
+              "valid": false,
+              "reason": "INSUFFICIENT_VALID_DEPTH"
+            },
+            "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+            "received": 5411126.633666943
+          }
+        },
+        "camera_evidence": [
+          {
+            "camera": "front",
+            "label": "ROS2 forward camera",
+            "source": "event_time_ros2_camera",
+            "age_seconds": 0.171,
+            "captured_at": "2026-11-16T06:53:10.610233+00:00",
+            "data_url": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAsICAoIBwsKCQoNDAsNERwSEQ8PESIZGhQcKSQrKigkJyctMkA3LTA9MCcnOEw5PUNFSElIKzZPVU5GVEBHSEX/2wBDAQwNDREPESESEiFFLicuRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUX/wAARCACgAKADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0GiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAIvNPoKPNPoKjopiJPNPoKPNPoKjooAk80+go81vQVHRQBJ5rego81vQVHRQBJ5rego81vQVHRQBJ5rego81vQVHRQBJ5rego81vQVHRQBJ5rego81vQVHRQBJ5rego81vQVHRQBJ5regpPOb0FMooA//2Q=="
+          },
+          {
+            "camera": "down",
+            "label": "ROS2 downward camera",
+            "source": "event_time_ros2_camera",
+            "age_seconds": 0.169,
+            "captured_at": "2026-11-16T06:53:10.612327+00:00",
+            "data_url": "data:image/jpeg;base64,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"
+          }
+        ],
+        "sequence": 22
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:10.785093+00:00",
+        "node_path": "root.2.0.1",
+        "node_type": "Action",
+        "status": "SUCCESS",
+        "sequence": 23
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:10.785139+00:00",
+        "node_path": "root.2.0.2",
+        "node_type": "Action",
+        "status": "RUNNING",
+        "sequence": 24
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "ACTION_STARTED",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:10.785164+00:00",
+        "action": {
+          "skill": "RETURN_HOME",
+          "args": []
+        },
+        "sequence": 25
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "ACTION_RESULT",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:24.659018+00:00",
+        "action": {
+          "skill": "RETURN_HOME",
+          "args": []
+        },
+        "result": "SUCCEEDED",
+        "facts": {
+          "found": true,
+          "inspected": {},
+          "holding": false,
+          "picked": false,
+          "placed": false,
+          "traversed": true,
+          "at_home": true,
+          "landed": false
+        },
+        "status": {
+          "position": [
+            0.8517148965926273,
+            0.648270272084944,
+            1.6034329848891222
+          ],
+          "velocity": [
+            0.00249835905305384,
+            0.0008459020412731448,
+            -0.0002091936166529743
+          ],
+          "yaw": 1.570782932292491,
+          "pose_received": 5411140.609392452,
+          "objects": {
+            "gate_left": {
+              "position": [
+                4.899999999999999,
+                3.650000000000001,
+                1.25
+              ],
+              "received": 5411123.851861794,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_right": {
+              "position": [
+                6.1999999999999975,
+                3.649999999999999,
+                1.25
+              ],
+              "received": 5411123.851861794,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_top": {
+              "position": [
+                5.549999999999999,
+                3.65,
+                2.5
+              ],
+              "received": 5411118.657241469,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "ground": {
+              "position": [
+                4.500000000000001,
+                2.5999999999999996,
+                -0.05000000000000049
+              ],
+              "received": 5411135.594911727,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "obstacle_1": {
+              "position": [
+                3.6000000000000005,
+                2.35,
+                1.0
+              ],
+              "received": 5411105.524491663,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "home": {
+              "position": [
+                0.8500000000000001,
+                0.6500000000000004,
+                0.0050000000000005596
+              ],
+              "received": 5411140.58575347,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            },
+            "blue_platform": {
+              "position": [
+                7.599999999999998,
+                4.150000000000001,
+                0.2500000000000002
+              ],
+              "received": 5411118.450949914,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "red_package": {
+              "position": [
+                4.838189047480572,
+                3.6139199380727463,
+                0.6531210661437822
+              ],
+              "received": 5411130.704931956,
+              "camera": "down",
+              "source": "learned_rgbd",
+              "stamp_ns": 46400000000,
+              "quality": {
+                "valid": true,
+                "position": [
+                  4.838189047480572,
+                  3.6139199380727463,
+                  0.6531210661437822
+                ],
+                "surface_position": [
+                  4.838189047480572,
+                  3.6139199380727463,
+                  0.7731210661437822
+                ],
+                "valid_pixels": 306,
+                "top_surface_pixels": 43,
+                "surface_mad_m": [
+                  2.3420811823271492e-06,
+                  0.011953469376542625,
+                  0.007072976348243887
+                ],
+                "assumptions": [
+                  "upright package",
+                  "known package height",
+                  "visible horizontal top"
+                ],
+                "source": "rgbd_geometry",
+                "uncertainty_calibrated": false
+              }
+            }
+          },
+          "gripper": "detached",
+          "gripper_received": 5411098.04991541,
+          "contacts": [],
+          "contact_received": 0.0,
+          "imu_received": 5411140.60820622,
+          "cameras": {
+            "front": {
+              "width": 256,
+              "height": 256,
+              "received": 5411140.498801826
+            },
+            "down": {
+              "width": 256,
+              "height": 256,
+              "received": 5411140.507860346
+            },
+            "external": {
+              "width": 256,
+              "height": 256,
+              "received": 5411140.511937427
+            }
+          },
+          "semantic_received": {
+            "front": 5411140.585812958,
+            "down": 5411140.58575347
+          },
+          "depth": {
+            "received": 5411140.515190361,
+            "center_median_m": 1.5135036706924438,
+            "width": 256,
+            "height": 256
+          },
+          "sequence": 1559,
+          "package_perception": {
+            "schema_version": "1.0",
+            "frame": "map",
+            "source": "learned_rgbd",
+            "stamp_ns": 56000000000,
+            "pose_skew_ns": 16000000,
+            "inference_seconds": 0.042703318409621716,
+            "valid": false,
+            "estimate": {
+              "valid": false,
+              "reason": "INSUFFICIENT_VALID_DEPTH"
+            },
+            "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+            "received": 5411140.571266028
+          }
+        },
+        "camera_evidence": [
+          {
+            "camera": "front",
+            "label": "ROS2 forward camera",
+            "source": "event_time_ros2_camera",
+            "age_seconds": 0.113,
+            "captured_at": "2026-11-16T06:53:24.542093+00:00",
+            "data_url": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAsICAoIBwsKCQoNDAsNERwSEQ8PESIZGhQcKSQrKigkJyctMkA3LTA9MCcnOEw5PUNFSElIKzZPVU5GVEBHSEX/2wBDAQwNDREPESESEiFFLicuRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUX/wAARCACgAKADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0GiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKa0gX3NR+a3tQBNRUPmt7Uea3tQBNRUPmt7Uea3tQBNRUPmt7Unmt7UAT0VB5re1HnN7UAT0VB5ze1HnP7UAT0VB5z+1J5z+1AFiiq/nP7Uec/tQBYooprOF+tADiQBk1E8ueF6UxmLHmkpiCiiigAooooAKKKKACkpaKAEopaSgAooooAKSlooASilooAleXsv51HRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAJRS0UAJRRRQAtFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//Z"
+          },
+          {
+            "camera": "down",
+            "label": "ROS2 downward camera",
+            "source": "event_time_ros2_camera",
+            "age_seconds": 0.104,
+            "captured_at": "2026-11-16T06:53:24.551152+00:00",
+            "data_url": "data:image/jpeg;base64,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"
+          }
+        ],
+        "sequence": 26
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:24.659421+00:00",
+        "node_path": "root.2.0.2",
+        "node_type": "Action",
+        "status": "SUCCESS",
+        "sequence": 27
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:24.659496+00:00",
+        "node_path": "root.2.0",
+        "node_type": "Sequence",
+        "status": "SUCCESS",
+        "sequence": 28
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:24.659549+00:00",
+        "node_path": "root.2",
+        "node_type": "Fallback",
+        "status": "SUCCESS",
+        "sequence": 29
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "BT_NODE",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:24.659597+00:00",
+        "node_path": "root",
+        "node_type": "Sequence",
+        "status": "SUCCESS",
+        "sequence": 30
+      },
+      {
+        "schema_version": "1.0",
+        "message_type": "MISSION_RESULT",
+        "run_id": "db6e1ea455784326a4738faf67896078",
+        "mission_revision": 1,
+        "time": "2026-11-16T06:53:24.664779+00:00",
+        "outcome": "MISSION_COMPLETED",
+        "facts": {
+          "found": true,
+          "inspected": {},
+          "holding": false,
+          "picked": false,
+          "placed": false,
+          "traversed": true,
+          "at_home": true,
+          "landed": false
+        },
+        "camera_evidence": [
+          {
+            "camera": "front",
+            "label": "ROS2 forward camera",
+            "source": "event_time_ros2_camera",
+            "age_seconds": 0.119,
+            "captured_at": "2026-11-16T06:53:24.542093+00:00",
+            "data_url": "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAsICAoIBwsKCQoNDAsNERwSEQ8PESIZGhQcKSQrKigkJyctMkA3LTA9MCcnOEw5PUNFSElIKzZPVU5GVEBHSEX/2wBDAQwNDREPESESEiFFLicuRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUVFRUX/wAARCACgAKADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD0GiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKa0gX3NR+a3tQBNRUPmt7Uea3tQBNRUPmt7Uea3tQBNRUPmt7Unmt7UAT0VB5re1HnN7UAT0VB5ze1HnP7UAT0VB5z+1J5z+1AFiiq/nP7Uec/tQBYooprOF+tADiQBk1E8ueF6UxmLHmkpiCiiigAooooAKKKKACkpaKAEopaSgAooooAKSlooASilooAleXsv51HRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAJRS0UAJRRRQAtFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//Z"
+          },
+          {
+            "camera": "down",
+            "label": "ROS2 downward camera",
+            "source": "event_time_ros2_camera",
+            "age_seconds": 0.11,
+            "captured_at": "2026-11-16T06:53:24.551152+00:00",
+            "data_url": "data:image/jpeg;base64,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"
+          }
+        ],
+        "sequence": 31
+      }
+    ],
+    "versions": [
+      {
+        "version": 1,
+        "time": "2026-11-16T06:52:42.191124+00:00",
+        "reason": "INITIAL",
+        "mission_spec": {
+          "mission_id": "mission_ros2_example",
+          "user_goal": "Find the red package, fly through the gate, and return home.",
+          "entities": [
+            {
+              "id": "drone",
+              "type": "drone",
+              "source": "SYSTEM_POLICY"
+            },
+            {
+              "id": "home",
+              "type": "location",
+              "source": "SYSTEM_POLICY"
+            },
+            {
+              "id": "red_package",
+              "type": "object",
+              "source": "USER"
+            },
+            {
+              "id": "blue_platform",
+              "type": "platform",
+              "source": "USER"
+            },
+            {
+              "id": "gate_1",
+              "type": "gate",
+              "source": "USER"
+            },
+            {
+              "id": "view_a",
+              "type": "viewpoint",
+              "source": "SYSTEM_POLICY"
+            },
+            {
+              "id": "view_b",
+              "type": "viewpoint",
+              "source": "SYSTEM_POLICY"
+            }
+          ],
+          "goals": [
+            {
+              "id": "G1",
+              "predicate": "found",
+              "args": [
+                "red_package"
+              ],
+              "source": "USER",
+              "source_text": "Find the red package"
+            },
+            {
+              "id": "G5",
+              "predicate": "traversed",
+              "args": [
+                "gate_1"
+              ],
+              "source": "USER",
+              "source_text": "fly through the gate"
+            },
+            {
+              "id": "G7",
+              "predicate": "at",
+              "args": [
+                "home"
+              ],
+              "source": "USER",
+              "source_text": "return home"
+            }
+          ],
+          "ordering": [],
+          "constraints": [
+            {
+              "name": "minimum_view_separation_deg",
+              "type": "geometry",
+              "params": {
+                "degrees": 30
+              },
+              "source": "SYSTEM_POLICY"
+            }
+          ],
+          "assumptions": [],
+          "unresolved": [],
+          "requested_capabilities": [
+            "SEARCH",
+            "INSPECT",
+            "PICK",
+            "TRAVERSE_GATE",
+            "NAVIGATE",
+            "PLACE",
+            "RETURN_HOME"
+          ],
+          "contingencies": [
+            {
+              "trigger": "gate_not_clear",
+              "action": "ABORT_AND_RETURN_HOME",
+              "authorization": "SYSTEM_POLICY",
+              "fallback": "ABORT_AND_RETURN_HOME",
+              "source_text": "Default: abort and return home."
+            }
+          ]
+        },
+        "validation": {
+          "status": "ACCEPTED",
+          "html_validation": null,
+          "scope": "supported arguments, goal coverage, runtime geometry and observations"
+        },
+        "robot_plan": {
+          "format": "behavior_tree_v1",
+          "root": {
+            "type": "Sequence",
+            "children": [
+              {
+                "type": "Action",
+                "skill": "SEARCH",
+                "args": [
+                  "red_package"
+                ]
+              },
+              {
+                "type": "Action",
+                "skill": "NAVIGATE",
+                "args": [
+                  "target_loc"
+                ]
+              },
+              {
+                "type": "Fallback",
+                "children": [
+                  {
+                    "type": "Sequence",
+                    "children": [
+                      {
+                        "type": "Condition",
+                        "predicate": "gate_clear",
+                        "args": [
+                          "gate_1"
+                        ]
+                      },
+                      {
+                        "type": "Action",
+                        "skill": "TRAVERSE_GATE",
+                        "args": [
+                          "gate_1"
+                        ]
+                      },
+                      {
+                        "type": "Action",
+                        "skill": "RETURN_HOME",
+                        "args": []
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "nominal_plan": [
+          {
+            "skill": "SEARCH",
+            "args": [
+              "red_package"
+            ]
+          },
+          {
+            "skill": "NAVIGATE",
+            "args": [
+              "target_loc"
+            ]
+          },
+          {
+            "skill": "TRAVERSE_GATE",
+            "args": [
+              "gate_1"
+            ]
+          },
+          {
+            "skill": "RETURN_HOME",
+            "args": []
+          }
+        ],
+        "pddl": "(define (problem accountable-drone-mission)\n  (:domain accountable-drone)\n  (:objects\n    drone - drone\n    red_package - object\n    home current_loc target_loc gate_loc blue_platform - location\n    gate_1 - gate\n    view_a view_b - viewpoint)\n  (:init\n    (at drone home)\n    (reachable home)\n    (reachable current_loc)\n    (reachable target_loc)\n    (reachable gate_loc)\n    (reachable blue_platform)\n    (platform blue_platform)\n    (gate-at gate_1 gate_loc)\n    (gripper-empty drone)\n    (object-at red_package target_loc)\n    (gate-clear gate_1))\n  (:goal (and\n    (found red_package)\n    (inspected red_package view_a)\n    (inspected red_package view_b)\n    (traversed gate_1)\n    (placed red_package blue_platform)\n    (at drone home)\n  ))\n)",
+        "state": {
+          "position": [
+            0.849425184962063,
+            0.6498704865366681,
+            0.41003405613473254
+          ],
+          "velocity": [
+            0.00653066544212035,
+            2.676424135421299e-09,
+            -0.000325967422613209
+          ],
+          "yaw": 2.1011874784249032e-05,
+          "pose_received": 5411098.145531674,
+          "objects": {
+            "gate_left": {
+              "position": [
+                4.900000000000002,
+                3.6500000000000004,
+                1.2500000000000002
+              ],
+              "received": 5411098.121569475,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_right": {
+              "position": [
+                6.200000000000001,
+                3.6500000000000004,
+                1.2500000000000004
+              ],
+              "received": 5411098.121569475,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "gate_top": {
+              "position": [
+                5.550000000000001,
+                3.6500000000000004,
+                2.5000000000000004
+              ],
+              "received": 5411098.121569475,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "ground": {
+              "position": [
+                4.5,
+                2.6,
+                -0.050000000000000044
+              ],
+              "received": 5411098.121569475,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "obstacle_1": {
+              "position": [
+                3.6000000000000005,
+                2.3499999999999996,
+                0.9999999999999999
+              ],
+              "received": 5411098.121569475,
+              "camera": "front",
+              "source": "logical_camera_oracle"
+            },
+            "home": {
+              "position": [
+                0.8500000000000001,
+                0.65,
+                0.004999999999999727
+              ],
+              "received": 5411098.121467034,
+              "camera": "down",
+              "source": "logical_camera_oracle"
+            }
+          },
+          "gripper": "detached",
+          "gripper_received": 5411098.04991541,
+          "contacts": [],
+          "contact_received": 0.0,
+          "imu_received": 5411098.141514015,
+          "cameras": {
+            "front": {
+              "width": 256,
+              "height": 256,
+              "received": 5411098.010711892
+            },
+            "down": {
+              "width": 256,
+              "height": 256,
+              "received": 5411098.01428702
+            },
+            "external": {
+              "width": 256,
+              "height": 256,
+              "received": 5411098.018962163
+            }
+          },
+          "semantic_received": {
+            "front": 5411098.121569475,
+            "down": 5411098.121467034
+          },
+          "depth": {
+            "received": 5411098.02071844,
+            "center_median_m": 0.32006075978279114,
+            "width": 256,
+            "height": 256
+          },
+          "sequence": 404,
+          "package_perception": {
+            "schema_version": "1.0",
+            "frame": "map",
+            "source": "learned_rgbd",
+            "stamp_ns": 14400000000,
+            "pose_skew_ns": 0,
+            "inference_seconds": 0.048378014005720615,
+            "valid": false,
+            "estimate": {
+              "valid": false,
+              "reason": "INSUFFICIENT_VALID_DEPTH"
+            },
+            "checkpoint": "rgbd_spark_cuda_v1/best.pt",
+            "received": 5411098.073532923
+          }
+        }
+      }
+    ],
+    "interrupts": [],
+    "human_decisions": [],
+    "outcome": "MISSION_COMPLETED",
+    "metrics": {
+      "distance_m": 17.750295191527325,
+      "collision": false,
+      "replans": 0,
+      "tracking_samples": [
+        1.1899659438652677,
+        1.1898003867495883,
+        1.1885985383543554,
+        1.186115645811062,
+        1.17726192142653,
+        1.170890611039114,
+        1.1542591579438461,
+        1.14399926537422,
+        1.1195914506217335,
+        1.1054677034237574,
+        1.090172427535843,
+        1.0565943930912254,
+        1.0385564132180778,
+        1.0004938042283462,
+        0.980636117977549,
+        0.9396080102970407,
+        0.9185480052559198,
+        0.8971859348168758,
+        0.8537065283318098,
+        0.8316527262219817,
+        0.8094251414509948,
+        0.7645354615492856,
+        0.7419099197174399,
+        0.6963718117129626,
+        0.6734833919078889,
+        0.6505289307771563,
+        0.6044548857746023,
+        0.5813491931483767,
+        0.5582055912933065,
+        0.5350440880288352,
+        0.488951593765676,
+        0.4661615262908818,
+        0.42159015209529294,
+        0.3999622576578293,
+        0.3788778329560462,
+        0.3384654898172518,
+        0.3191544072045362,
+        0.30049042834505246,
+        0.30049042834505246,
+        0.26519644465793185,
+        0.24856851179499148,
+        0.23264201253340566,
+        0.20288398295843052,
+        0.18899740819262298,
+        0.17577529956808396,
+        0.1512707854341296,
+        0.13993227812434028,
+        0.11903271167151407,
+        0.10944088850313984,
+        0.09192973481917624,
+        0.08396631145715412,
+        0.07651511087183545,
+        0.06955118072056547,
+        0.056965461229730174,
+        0.051292973143108524,
+        0.041111969605142205,
+        0.03656421121422441,
+        0.03236133392574485,
+        0.02848397991156216,
+        0.021625049685822555,
+        0.018599187662075637,
+        0.013284682721205126,
+        0.010967861799964732,
+        0.008864025725280967,
+        0.0052347664163271326,
+        0.003678212406776126,
+        0.001030053431198837,
+        0.001030053431198837,
+        8.499560191216948e-05,
+        0.001940428454965689,
+        0.0027013177695408446,
+        0.0033608349302036386,
+        0.00441045515678938,
+        0.004817449578460191,
+        0.005427532760941376,
+        0.005643469088079196,
+        0.005807066735732311,
+        0.005998450746892729,
+        0.006035851304499033,
+        0.006039811818221019,
+        5.461810912914225,
+        5.461823361149158,
+        5.461796859724084,
+        5.460660484990049,
+        5.459040286862848,
+        5.456490328620315,
+        5.448251118486604,
+        5.442453407583999,
+        5.427329374716016,
+        5.417965518520559,
+        5.407389492209693,
+        5.382614205106866,
+        5.368468196824487,
+        5.353222851310705,
+        5.319751669277179,
+        5.301704171981986,
+        5.263444346416378,
+        5.243411304116315,
+        5.201954322962236,
+        5.180679564825705,
+        5.159128731094724,
+        5.115422176820685,
+        5.093360799459914,
+        5.071212507599604,
+        5.026775710486037,
+        5.00453443052463,
+        4.9823016507252555,
+        4.937910054097008,
+        4.915767555422461,
+        4.8716111643101945,
+        4.849600375752003,
+        4.8276342595470805,
+        4.783829341575429,
+        4.761985536190999,
+        4.740176808250195,
+        4.696651349209859,
+        4.67492791838374,
+        4.6315436847771,
+        4.609876991086585,
+        4.588223691401487,
+        4.5449480396893405,
+        4.523321680459555,
+        4.480083745565015,
+        4.458469575728812,
+        4.43685722168663,
+        4.3936348368844715,
+        4.372023617566606,
+        4.328799158193254,
+        4.307185427687357,
+        4.285570510704014,
+        4.242336913035951,
+        4.220718238352633,
+        4.177477433697906,
+        4.155855479099133,
+        4.134232630335253,
+        4.090984684165354,
+        4.0693598019732935,
+        4.047734457875117,
+        4.004482771855995,
+        3.9828566017391913,
+        3.939603987304059,
+        3.9179776653645737,
+        3.8963514021721517,
+        3.853099203154752,
+        3.8314733244424035,
+        3.7882221127597324,
+        3.7665968028541217,
+        3.7449716992810576,
+        3.7017221131977553,
+        3.6800976236392198,
+        3.6584733293108567,
+        3.615225293682937,
+        3.5936015324244592,
+        3.5503544710055657,
+        3.528731148865834,
+        3.5071079511572587,
+        3.463861885892983,
+        3.442238997313233,
+        3.4206161918284432,
+        3.3773707954873546,
+        3.355748188326294,
+        3.3125031199251,
+        3.290880646296551,
+        3.2692582055588155,
+        3.226013404024598,
+        3.2043910349969305,
+        3.161146342791176,
+        3.139524013982774,
+        3.117901693432221,
+        3.07465706970796,
+        3.0530347634596757,
+        3.031412459100349,
+        2.988167852079407,
+        2.9665455479156106,
+        2.9233009350365107,
+        2.9016786254880365,
+        2.8800563133621275,
+        2.836811680739102,
+        2.8151893600829334,
+        2.7719447094769567,
+        2.750322379529384,
+        2.7287000464891196,
+        2.685455371660095,
+        2.6638330301666846,
+        2.620588339422984,
+        2.5989659904449494,
+        2.5773436392046714,
+        2.53409893061544,
+        2.512476573595341,
+        2.490854214893663,
+        2.447609493039054,
+        2.4259871301927682,
+        2.3827424012277882,
+        2.3611200353720787,
+        2.339497668745399,
+        2.296252933735696,
+        2.2746305656192236,
+        2.2530081972297746,
+        2.2097634601369918,
+        2.1881410916899573,
+        2.1448963555297302,
+        2.1232739880475338,
+        2.101651621107642,
+        2.0584068893442287,
+        2.0367845247696725,
+        1.9935397987982308,
+        1.9719174376411703,
+        1.9502950778609376,
+        1.907050362943125,
+        1.8854280080687802,
+        1.8638056550885886,
+        1.8205609553494488,
+        1.7989386088726633,
+        1.7556939234224977,
+        1.7340715847525505,
+        1.7124492489946084,
+        1.6692045868763867,
+        1.6475822608625563,
+        1.625959938452234,
+        1.5827153052063312,
+        1.561092994773668,
+        1.5178483873612931,
+        1.4962260908404905,
+        1.474603799434699,
+        1.4313592330165432,
+        1.4097369585628239,
+        1.3664924286816689,
+        1.3448701739125417,
+        1.323247926396433,
+        1.280003454669903,
+        1.2583812312945184,
+        1.2367590168480074,
+        1.1935146167398283,
+        1.1718924321649025,
+        1.128648096995306,
+        1.1070259477468283,
+        1.0854038117079614,
+        1.0421595825747185,
+        1.0205374913109726,
+        0.9989154169348166,
+        0.9556713234462753,
+        0.9340493068978671,
+        0.890805341535273,
+        0.8691833960941443,
+        0.8475614780149335,
+        0.8043177327695445,
+        0.7826959106253406,
+        0.7394523820526174,
+        0.7178306825930647,
+        0.6962090317187756,
+        0.6529658950252064,
+        0.6313444205069831,
+        0.5881016936145129,
+        0.5664804062832857,
+        0.544859115312405,
+        0.5016263939912419,
+        0.48004244277420804,
+        0.4370893243193277,
+        0.41582062273108433,
+        0.39476758288966757,
+        0.35356219568161895,
+        0.33352987553500024,
+        0.2948500716562708,
+        0.27629489773660476,
+        0.2583183881193588,
+        0.22424989817753635,
+        0.20821619355704793,
+        0.19287059775972096,
+        0.16428749647906676,
+        0.15106571657656612,
+        0.13855490274660195,
+        0.1156391367457556,
+        0.10521454078888753,
+        0.08634413934318455,
+        0.07785975824596648,
+        0.06998188880159298,
+        0.0626896968188423,
+        0.049776354558238395,
+        0.0441051063784673,
+        0.03419505858029032,
+        0.02990438765650089,
+        0.022534062170646366,
+        0.019411310442756888,
+        0.016635886911168702,
+        0.012051471629119563,
+        0.010209064490554563,
+        0.008646998733826147,
+        0.00631185180363828,
+        0.005510873239644353,
+        0.00453225901097287,
+        0.004284679054221443,
+        0.8439679343861844,
+        0.8435178210191199,
+        0.8427690778580161,
+        0.8419909986981994,
+        0.8405209547915501,
+        0.834631810335085,
+        0.8299534887189406,
+        0.8167881442294439,
+        0.8082315061984336,
+        0.7983396392744141,
+        0.7745711261181056,
+        0.7607298262138299,
+        0.7456348735727456,
+        0.7119730080365824,
+        0.6935912272656946,
+        0.6743121101334772,
+        0.6334862988874357,
+        0.6121465103675656,
+        0.5680892995377417,
+        0.5455429562482083,
+        0.5227569359515195,
+        0.4768330677847143,
+        0.45388630144491104,
+        0.43106961525942433,
+        0.3861848265769393,
+        0.36428130153583155,
+        0.32188211373709896,
+        0.30150822317576514,
+        0.28175643469456263,
+        0.24430504133685052,
+        0.22667603440499876,
+        0.19370725049589088,
+        0.17839382019582323,
+        0.16386969848806848,
+        0.13719650510817324,
+        0.12503436298562504,
+        0.10297003183036983,
+        0.09302803466589604,
+        0.08378237097063493,
+        0.06728445534172686,
+        0.05997933469720176,
+        0.047102498005534024,
+        0.041470808282548545,
+        0.03633695051857512,
+        0.027448527888657592,
+        0.02363720457496087,
+        0.02020875925275472,
+        0.014392713287462494,
+        0.011954880233751235,
+        0.007899884253878041,
+        0.006241191892792239,
+        0.004805347120981505,
+        0.0025666051056317312,
+        0.0017824141242847175,
+        0.00118662004289661,
+        2.1509889772813544,
+        2.151468786682757,
+        2.1518605679404015,
+        2.1513219040827747,
+        2.149766846692506,
+        2.143015712087328,
+        2.137554312281548,
+        2.1305802363205704,
+        2.111865729131961,
+        2.100052282079419,
+        2.0865722007394636,
+        2.054581423758253,
+        2.0360926803737067,
+        1.9943743878277331,
+        1.971321115715569,
+        1.9469479557028828,
+        1.8947308594523897,
+        1.86713562849195,
+        1.8387100660308213,
+        1.7798345445301857,
+        1.7495999472113266,
+        1.6880054102061712,
+        1.656808618170505,
+        1.6254379720451415,
+        1.5624025003258526,
+        1.5308287264639415,
+        1.4677353113006668,
+        1.4362640962092679,
+        1.4048654415111896,
+        1.3423263584621452,
+        1.3111956901823645,
+        1.2801581357739857,
+        1.2183532823871273,
+        1.1875767864607631,
+        1.1262434829811636,
+        1.0956727604840943,
+        1.0651560430314475,
+        1.0042562679893587,
+        0.973859310424509,
+        0.9131403917935594,
+        0.8828072074317742,
+        0.8524838607974965,
+        0.7918547595579216,
+        0.7615426946573456,
+        0.7312274346826937,
+        0.6706451918080588,
+        0.6404498165620052,
+        0.5805200453758613,
+        0.5509330105253967,
+        0.5217046120409582,
+        0.4646656956547059,
+        0.4370230925350728,
+        0.3838443381629649,
+        0.3584363961452545,
+        0.333891832500107,
+        0.28758705733493606,
+        0.2659036595642708,
+        0.22557467349771768,
+        0.20694956128778644,
+        0.18935447170660852,
+        0.15724176785863547,
+        0.14270608740542484,
+        0.12915611011174322,
+        0.10490473015162134,
+        0.09414485571427422,
+        0.08424825895090535,
+        0.06689779469727411,
+        0.05937156630352154,
+        0.04641658759110855,
+        0.04090877256511358,
+        0.03599624798997254,
+        0.03164194627678641,
+        0.024465939264188514,
+        0.024465939264188514,
+        0.019091892041073647,
+        0.016986501422119594,
+        0.013745021172662249,
+        0.012528530623270402,
+        0.010705877572298869,
+        0.010024746940434539,
+        0.009453332901039089,
+        0.008534004842406262,
+        0.008145832825068467,
+        0.0,
+        0.0005779700783601566,
+        0.0015059015456247607,
+        0.001867324503271088,
+        0.002171285366951239,
+        0.002636082026661808,
+        0.002809024575890765,
+        0.0029484819315889876,
+        0.0030584410619688127,
+        0.0032029291075752813,
+        0.0032426669986822905,
+        0.003266968737003028,
+        0.0032550468580651074,
+        0.006120799472902556,
+        0.006146714776590484,
+        0.006136728974951675,
+        0.006037212563135804,
+        0.005952503229308672,
+        0.005848660592654406,
+        0.005594003003150831,
+        0.005447872193051939,
+        0.005129235894003144,
+        0.004960214084812976,
+        0.004787061624289851,
+        0.004432978227723417,
+        0.004254015601621393,
+        0.0,
+        0.0003577608160043561,
+        0.0005110811888961147,
+        0.0006447043934166136,
+        0.0008585125907516071,
+        0.0009416921365688548,
+        0.001010710015756161,
+        0.0011109592843703685,
+        0.0011445307420317118,
+        0.0011835460587574429,
+        0.0011907872898145057,
+        0.0011848694929325286,
+        0.0011732261900657434,
+        0.1503395667119213,
+        0.15033473152311677,
+        0.1502988916257878,
+        0.15011255532681334,
+        0.14887247840697077,
+        0.1476901090801637,
+        0.14609721727126962,
+        0.1416775624199523,
+        0.13887437436714434,
+        0.13570350036313267,
+        0.12837925011144746,
+        0.12429518809200056,
+        0.11546628976792492,
+        0.11079794230183612,
+        0.10601058278076095,
+        0.09622475128036431,
+        0.0912936472076969,
+        0.08149889105940003,
+        0.0766869619823284,
+        0.07196260470082487,
+        0.06285647647690708,
+        0.05850774402567641,
+        0.050275746223572365,
+        0.04641014381879798,
+        0.04271989119879041,
+        0.035882157412334054,
+        0.03273872263130947,
+        0.026996470142188124,
+        0.024392830249489114,
+        0.02196277310931014,
+        1.4219442822432038,
+        1.4175985278688923,
+        1.4156343914368008,
+        1.4135420994877756,
+        1.4078225951062975,
+        1.403791935643162,
+        1.392858977077264,
+        1.3858399039174933,
+        1.3777292866891355,
+        1.3581200828714992,
+        1.3465855639318802,
+        1.3200859997888046,
+        1.3052033814836885,
+        1.2893186936714554,
+        1.2548649879174836,
+        1.2364663638852187,
+        1.1977500634059592,
+        1.177594718454859,
+        1.1570085270197672,
+        1.1148125450224773,
+        1.0933217453250945,
+        1.07163767609712,
+        1.0278588107104918,
+        1.00583409836797,
+        0.9837569792061794,
+        0.9395309950208611,
+        0.9174148773287857,
+        0.8732331202771262,
+        0.8511819854828228,
+        0.8291634098504828,
+        0.7852319975811656,
+        0.7633200289221009,
+        0.7414429062893337,
+        0.6977863416481305,
+        0.6760024373330606,
+        0.6325107814691353,
+        0.6107977763658176,
+        0.5891032420999985,
+        0.5457598380338763,
+        0.5241060827524339,
+        0.48084541433524663,
+        0.4592918200566237,
+        0.4378475854077653,
+        0.41657276143923044,
+        0.3747923179843984,
+        0.35440138800738696,
+        0.31485143478595334,
+        0.2957880029327109,
+        0.2593012372884033,
+        0.24195675995472685,
+        0.22525447430625878,
+        0.19388344355044296,
+        0.1792511333306141,
+        0.1521142449029406,
+        0.1396086251496327,
+        0.1278053938985413,
+        0.1062779378387814,
+        0.09652879039789856,
+        0.08742912878382095,
+        0.07109262050538635,
+        0.06381240574123784,
+        0.057090177220940265,
+        0.04521589924862436,
+        0.040014503047802095,
+        0.030958261548686753,
+        0.027055584350535334,
+        0.02353888294806514,
+        0.01757579416137565,
+        0.015088359473344071,
+        0.01100592477283788,
+        0.009377798936922215,
+        0.006878917457480166,
+        0.005981467863546028,
+        0.005296930707373618,
+        0.004462698282298984,
+        0.004244950898943882,
+        1.115041784411997,
+        1.1153648523864035,
+        1.1154591574046604,
+        1.115300960431223,
+        1.113268046193553,
+        1.1109965830428081,
+        1.1033171179881949,
+        1.097771445247761,
+        1.0910356615770789,
+        1.07392484895752,
+        1.0635400509677884,
+        1.0391343922586656,
+        1.0251471541668074,
+        1.0100188753612527,
+        0.9765900240452634,
+        0.9584468801997887,
+        0.9394682019167842,
+        0.8993756498994254,
+        0.8784457851476335,
+        0.8352498930022864,
+        0.8131415019024397,
+        0.7907870599700706,
+        0.7455827881596757,
+        0.7228362555315321,
+        0.6772586788821757,
+        0.6544906728166044,
+        0.6317686701193768,
+        0.5865294540512944,
+        0.5640344837012211,
+        0.5193225917225166,
+        0.49711610969115677,
+        0.47502564296882827,
+        0.43132111038793974,
+        0.40979298653581225,
+        0.38854125900322656,
+        0.34706839347683516,
+        0.3269503074801612,
+        0.28817864609514854,
+        0.2696111931302078,
+        0.25164137766224554,
+        0.21763806140363884,
+        0.2016638706313988,
+        0.17185928837151973,
+        0.1580507716883192,
+        0.1449782591295431,
+        0.12104357272626286,
+        0.11017034325173598,
+        0.10000863346252375,
+        0.08175221937009682,
+        0.07361870425295157,
+        0.06611629752785275,
+        0.052900578617981635,
+        0.047132299638622595,
+        0.041884266332944085,
+        0.032831796732958864,
+        0.028969382769524522,
+        0.022424778220005277,
+        0.019685705488005762,
+        0.017265956230491847,
+        0.013282838102338865,
+        0.011671350688730528,
+        0.010282093526478216,
+        0.008081173950934693,
+        0.007227120585804004,
+        0.005911400761296473,
+        0.0054128823488028294,
+        2.0419436594548888,
+        2.0415807264655226,
+        2.040982108389947,
+        2.0403265020239445,
+        2.0390127344007305,
+        2.033406502058558,
+        2.0287739857825913,
+        2.0153353688011464,
+        2.006401227439387,
+        1.995933035922452,
+        1.9702974194095395,
+        1.9551057685521256,
+        1.9200328396251625,
+        1.900249682144234,
+        1.8790737590341204,
+        1.832962444324707,
+        1.8082593187703335,
+        1.782617734073344,
+        1.7289953234658018,
+        1.7012428313783166,
+        1.6730044658510743,
+        1.6443777373364392,
+        1.6154520744399705,
+        1.55701902728699,
+        1.5276482102264128,
+        1.4688783305494195,
+        1.4395691454655806,
+        1.4103593004911343,
+        1.352353285318096,
+        1.3236117745486338,
+        1.2667847735456466,
+        1.2387539628498792,
+        1.2110107810619546,
+        1.1564696324618127,
+        1.129700963991253,
+        1.0771963934400701,
+        1.051462182893615,
+        1.026068839940887,
+        0.9762753631789445,
+        0.9518525044243509,
+        0.9277248319559591,
+        0.8802875970247214,
+        0.8569424545212815,
+        0.810903828730975,
+        0.7881733228055923,
+        0.7656115253733855,
+        0.7209281503921756,
+        0.6987752761368431,
+        0.654774673299436,
+        0.6329018382452432,
+        0.6110991770521392,
+        0.5676668339957147,
+        0.5460205327313357,
+        0.5028366488727173,
+        0.48130847075891353,
+        0.45984685533538855,
+        0.4172773944677516,
+        0.39626758641447407,
+        0.37550872450169,
+        0.33496554193716566,
+        0.31529320475924993,
+        0.2960864721104256,
+        0.25925194051987804,
+        0.24170755170851616,
+        0.20852521948510144,
+        0.19293823473687516,
+        0.16386845840085176,
+        0.1504129861775021,
+        0.13768699482341729,
+        0.11442881747809475,
+        0.10388653179364386,
+        0.08490736384154726,
+        0.0764348253321965,
+        0.06861161258457704,
+        0.05481515411373145,
+        0.04878901869876919,
+        0.03833365388309816,
+        0.03384401276146986,
+        0.029806718148480307,
+        0.022974042444059144,
+        0.020122414688740358,
+        0.017609906000655845,
+        0.013492112752402058,
+        0.011834368318010784,
+        0.009194885932630733,
+        0.008164402543886931,
+        0.007295854831933449,
+        0.005956207329625074,
+        0.005444207360033804,
+        3.060615991467407,
+        3.0603917557708598,
+        3.0600711889601735,
+        3.0596358738324922,
+        3.0565980806015305,
+        3.05347799121358,
+        3.0490666395558543,
+        3.0359753940707246,
+        3.0271574779223736,
+        3.004751378668989,
+        2.9911096670624535,
+        2.9758206862689236,
+        2.9588880416100123,
+        2.9202455465394284,
+        2.8986801009232734,
+        2.8515603841315262,
+        2.826238291083724,
+        2.799901531191773,
+        2.7446616503345247,
+        2.7159867814500975,
+        2.6570468465222556,
+        2.6269660198962055,
+        2.5965862267470903,
+        2.5659778157809323,
+        2.5043132583868792,
+        2.4733555755807455,
+        2.411379005325442,
+        2.380416140031516,
+        2.3186397628407636,
+        2.2878518070650964,
+        2.257141505585075,
+        2.1959686338933535,
+        2.1655078397329452,
+        2.104829964780041,
+        2.074606521223932,
+        2.044454785407647,
+        1.984348545547168,
+        1.9543849281264265,
+        1.8946153639817664,
+        1.8648017313218952,
+        1.835031138828008,
+        1.7756084639165,
+        1.7459522374291547,
+        1.6867435672713347,
+        1.6571899718140564,
+        1.5981848456089713,
+        1.568734766349476,
+        1.5393213436044504,
+        1.4806115646817908,
+        1.4513196081180495,
+        1.4220731604695573,
+        1.3637293779639896,
+        1.3346391587683704,
+        1.2766426262432566,
+        1.2477455014532988,
+        1.2189226708415444,
+        1.1615390651652142,
+        1.1330080327811414,
+        1.1046088747549607,
+        1.0483005314534977,
+        1.020441301078673,
+        0.992810301768935,
+        0.9383198606939096,
+        0.911495267512077,
+        0.8849665887771487,
+        0.8328244490928493,
+        0.8072159447783688,
+        0.7569059050427696,
+        0.7321892933473629,
+        0.7077513580225502,
+        0.6596620879894883,
+        0.6359825242531649,
+        0.6125250642029144,
+        0.5662110333148507,
+        0.5433219231372884,
+        0.4980081348649522,
+        0.4755925312834261,
+        0.4533675787156604,
+        0.40966195029608893,
+        0.38827926464096657,
+        0.34667820575762703,
+        0.3265560652535702,
+        0.3069477471877035,
+        0.2694533683736603,
+        0.2516419675135519,
+        0.23448808989870365,
+        0.20223823276047,
+        0.1871738574715829,
+        0.15918632806167873,
+        0.14626312922418436,
+        0.13404934967651178,
+        0.11172531223138978,
+        0.10159450258288517,
+        0.09212885487933485,
+        0.07512167967007502,
+        0.06753925460844196,
+        0.05408952177747811,
+        0.0481717069584919,
+        0.04275869002654411,
+        0.033350937693205025,
+        0.02930767104575614,
+        0.025671327177448446,
+        0.01952318771270513,
+        0.016967575754901782,
+        0.012789735270674544,
+        0.011128719144839786,
+        0.009728765088800002,
+        0.00763305591417084,
+        0.006891760236628773,
+        0.005885551950988823,
+        0.005559014319205135,
+        0.0,
+        0.0006322058290652118,
+        0.0016060318444748544,
+        0.001965915485758299,
+        0.0024784006456581922,
+        0.00264751985274714,
+        0.002768162649863317,
+        0.0028467095127956096,
+        0.0029002192950723584,
+        0.0028852003991667657,
+        0.0027928281369655494
+      ],
+      "duration_seconds": 42.46954728290439
+    },
+    "finished_at": "2026-11-16T06:53:24.660621+00:00",
+    "final_facts": {
+      "found": true,
+      "inspected": {},
+      "holding": false,
+      "picked": false,
+      "placed": false,
+      "traversed": true,
+      "at_home": true,
+      "landed": false
+    }
+  }
+}

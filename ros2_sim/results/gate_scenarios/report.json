@@ -1,0 +1,135 @@
+{
+  "scene_3": {
+    "outcome": "MISSION_COMPLETED",
+    "facts": {
+      "found": true,
+      "inspected": {
+        "view_a": [
+          6.441613647060305,
+          1.2991260648800227,
+          1.5998250230957436
+        ],
+        "view_b": [
+          7.7468037223831026,
+          1.2921458836412036,
+          1.6033546285305933
+        ]
+      },
+      "holding": false,
+      "picked": true,
+      "placed": true,
+      "traversed": true,
+      "at_home": true,
+      "landed": false,
+      "placed_on": "red_platform"
+    },
+    "interrupts": 0,
+    "collision": false,
+    "duration_seconds": 77.3042199332267
+  },
+  "scene_1": {
+    "outcome": "MISSION_COMPLETED",
+    "facts": {
+      "found": true,
+      "inspected": {
+        "view_a": [
+          6.444843899864073,
+          1.2977167345838905,
+          1.5998245566863603
+        ],
+        "view_b": [
+          7.7507743589661215,
+          1.2929218457938993,
+          1.603275542957333
+        ]
+      },
+      "holding": false,
+      "picked": true,
+      "placed": true,
+      "traversed": true,
+      "at_home": true,
+      "landed": false,
+      "placed_on": "blue_platform"
+    },
+    "interrupts": 0,
+    "collision": false,
+    "duration_seconds": 76.67738732136786
+  },
+  "scene_2": {
+    "outcome": "MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS",
+    "facts": {
+      "found": true,
+      "inspected": {
+        "view_a": [
+          6.4402862213328405,
+          1.2988593041109278,
+          1.5998341887118568
+        ],
+        "view_b": [
+          7.745603293953414,
+          1.2924790002985478,
+          1.6034452855060015
+        ]
+      },
+      "holding": false,
+      "picked": true,
+      "placed": true,
+      "traversed": false,
+      "at_home": true,
+      "landed": false,
+      "placed_on": "blue_platform"
+    },
+    "interrupts": 0,
+    "collision": false,
+    "duration_seconds": 72.91335879359394
+  },
+  "condition_without_navigation": {
+    "outcome": "MISSION_COMPLETED",
+    "facts": {
+      "found": true,
+      "inspected": {},
+      "holding": false,
+      "picked": false,
+      "placed": false,
+      "traversed": true,
+      "at_home": true,
+      "landed": false
+    },
+    "interrupts": 0,
+    "collision": false,
+    "duration_seconds": 42.46954728290439
+  },
+  "limitations": [
+    "Gate sensing uses logical cameras; learned RGB-D is used for package localization.",
+    "An additional full mission without explicit gate navigation timed out during the RGB-D grasp before reaching the gate; preserved in session_logs/gate_regression_pick_timeout. The isolated no-navigation gate condition test passed.",
+    "These are individual deterministic scene runs, not statistical reliability estimates."
+  ],
+  "scene_4": {
+    "outcome": "MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS",
+    "facts": {
+      "found": true,
+      "inspected": {
+        "view_a": [
+          6.44405932861495,
+          1.2976229009248588,
+          1.5998389916021287
+        ],
+        "view_b": [
+          7.749890278348117,
+          1.2925278734455516,
+          1.603459856510634
+        ]
+      },
+      "holding": false,
+      "picked": true,
+      "placed": true,
+      "traversed": false,
+      "at_home": true,
+      "landed": false,
+      "placed_on": "red_platform"
+    },
+    "interrupts": 0,
+    "collision": false,
+    "duration_seconds": 69.96607269439846
+  }
+}

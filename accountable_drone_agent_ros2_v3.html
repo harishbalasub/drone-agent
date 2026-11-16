@@ -32,7 +32,7 @@ label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5
 <div class="stack">
 <section class="panel"><div class="panel-head"><h2>Execution connection</h2><span class="badge" id="simConnection" hidden>DISCONNECTED</span></div><div class="panel-body stack">
 <label>Execution backend</label><select id="executionBackend"><option value="browser">Browser simulation</option><option value="external">External Gazebo / ROS 2</option></select>
-<div class="note">The original app remains available as <a href="accountable_drone_agent_prototype_v2.html">version 2</a>. External execution uses the world selected when launching Gazebo; the scenario selector below controls the browser world only.</div>
+<div class="note">The original app remains available as <a href="accountable_drone_agent_prototype_v2.html">version 2</a>. Use the scenario selector below to choose the browser or Gazebo world while idle. Changing scenarios clears the previous plan.</div>
 <div id="externalControls" class="stack" hidden>
 <label>External scene view</label><select id="externalView"><option value="scene">Live 3D scene camera</option><option value="map">Telemetry map</option></select>
 <button class="btn" id="connectSim">Check simulator connection</button><div id="externalSummary" class="small">Launch ros2_sim/scripts/launch.sh, then choose External Gazebo / ROS 2.</div>
@@ -70,7 +70,7 @@ label{font-size:12px;font-weight:700;color:#39475d;display:block;margin-bottom:5
 <div class="pipeline"><div class="pipe active" id="pipeMission">Mission</div><div class="pipe" id="pipeSpec">Spec</div><div class="pipe" id="pipeValidate">Validate</div><div class="pipe" id="pipePlan">Behavior Tree</div><div class="pipe" id="pipeExecute">Execute</div></div>
 <div class="panel-head"><h2>Drone Simulation</h2><div class="toolbar"><span class="badge" id="worldVersionBadge">WORLD v1</span><button class="btn" id="modeBtn">Mode: EDIT</button><button class="btn" id="observeBtn">Refresh Observation</button><button class="btn warn" id="resetWorldBtn">Reset World</button></div></div>
 <div class="panel-body">
-<div class="row"><div><label>World scenario</label><select id="scenario"><option value="1">Scenario 1 — gate clear</option><option value="2">Scenario 2 — gate blocked</option><option value="3">Scenario 3 — blue and red platforms</option></select></div><div><label>Execution status</label><span id="executionStatus" class="badge">IDLE</span></div></div>
+<div class="row"><div><label>World scenario</label><select id="scenario"><option value="1">Scenario 1 — gate clear</option><option value="2">Scenario 2 — gate blocked</option><option value="3">Scenario 3 — blue and red platforms</option><option value="4">Scenario 4 — blocked gate, blue and red platforms</option></select></div><div><label>Execution status</label><span id="executionStatus" class="badge">IDLE</span></div></div>
 <div id="humanPanel" hidden class="note"><b>Gate blocked — human decision required</b><p>Approve bypassing the gate and continuing delivery, or abort and return home. No response within 30 seconds selects safe return.</p><button id="approveBypassBtn" class="btn success">Approve bypass</button> <button id="abortMissionBtn" class="btn warn">Abort and return home</button></div>
 <div class="sim-wrap">
 <div><div id="externalScene" hidden><label>Live 3D scene · Gazebo external camera</label><img id="externalImage" style="width:100%;height:380px;object-fit:contain;background:#e7ebef;border-radius:10px" alt="No scene frame received. Use --render-headless or choose Telemetry map."/></div><canvas id="sim" width="900" height="520"></canvas>
@@ -856,15 +856,15 @@ function restoreReusablePlan(saved){
    if(validationResult)renderValidation(validationResult);
    badge('planBadge','PLAN READY — REUSED','good');
 }
-function applyScenario({reusePlan=false}={}){
+function applyScenario({reusePlan=false,externalReset=false}={}){
  if(running)return;
  const saved=reusePlan&&reusablePlan?.scenario===document.getElementById('scenario').value?reusablePlan:null;
  if(!saved)reusablePlan=null;
  if(saved){document.getElementById('battery').value=saved.battery;document.getElementById('batteryValue').textContent=saved.battery;}
 
  document.getElementById('gatePolicySummary').hidden=true;document.getElementById('clarificationPanel').hidden=true;
- world=clone(worldDefaults);if(document.getElementById("scenario").value==="2")world.gateObstacle={id:"gate_blocker",type:"obstacle",x:555,y:155,w:90,h:80};
- if(document.getElementById("scenario").value==="3")world.redPlatform={id:'red_platform',type:'platform',x:760,y:255,w:105,h:52};
+ world=clone(worldDefaults);if(["2","4"].includes(document.getElementById("scenario").value))world.gateObstacle={id:"gate_blocker",type:"obstacle",x:555,y:155,w:90,h:80};
+ if(["3","4"].includes(document.getElementById("scenario").value))world.redPlatform={id:'red_platform',type:'platform',x:760,y:255,w:105,h:52};
  document.getElementById('redPlatformLegend').hidden=!world.redPlatform;
  worldVersion++;verifiedState={version:0,observedAt:0,targetVisible:"UNKNOWN",targetLocalized:"UNKNOWN",gateClear:"UNKNOWN",holding:false,placed:false,atHome:true,inspectedViews:[],traversedGate:false,battery:Number(document.getElementById("battery").value)};
  completedGoals=[];stopRequested=false;humanResolver=null;editMode=true;session.outcome='NOT_STARTED';setExecutionState('IDLE');updateMode();
@@ -875,7 +875,9 @@ function applyScenario({reusePlan=false}={}){
    for(const id of ['validateBtn','runBtn','pddlBtn','planBtn'])document.getElementById(id).disabled=true;
    document.getElementById('specOut').textContent='Generate a mission specification for the selected scenario.';document.getElementById('pddlOut').textContent='Optional PDDL export not generated.';document.getElementById('planOut').textContent='Plan not generated.';badge('planBadge','REPLAN REQUIRED','warn');
  }
- badge('worldVersionBadge','WORLD v'+worldVersion,'warn');refreshObservation(saved?'world reset':'scenario selected');
+ badge('worldVersionBadge','WORLD v'+worldVersion,'warn');
+ if(externalReset)verifiedState={version:0,observedAt:0,targetVisible:'UNKNOWN',targetLocalized:'UNKNOWN',gateClear:'UNKNOWN',holding:false,placed:false,atHome:false,inspectedViews:[],traversedGate:false,battery:null};
+ else refreshObservation(saved?'world reset':'scenario selected');
  log(saved?'World reset; original Robot Plan restored and ready to run again.':`Scenario ${document.getElementById('scenario').value} loaded; old plan invalidated.`,saved?'good':'warn');
  recordVersion(saved?'WORLD_RESET_PLAN_REUSED':'SCENARIO_CHANGED');updatePanels();
 }

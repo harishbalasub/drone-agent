@@ -46,6 +46,7 @@ def drone():
 
 def generate(blocked=False, cameras=True, scenario=None):
     scenario=scenario or (2 if blocked else 1)
+    blocked=scenario in [2,4]
     systems=['Physics','UserCommands','SceneBroadcaster','Imu','Contact','LogicalCamera']
     files=['physics','user-commands','scene-broadcaster','imu','contact','logical-camera']
     s='<sdf version="1.9"><world name="mission"><physics name="physics" type="ignored"><max_step_size>0.004</max_step_size><real_time_factor>1</real_time_factor></physics>'
@@ -57,7 +58,7 @@ def generate(blocked=False, cameras=True, scenario=None):
     s+=box('home',(.85,.65,.005),(.6,.6,.01),'.1 .1 .1')
     s+=box('obstacle_1',(3.6,2.35,1),(1.05,.72,2),'.4 .4 .4')
     s+=box('blue_platform',(7.6,4.15,.25),(1.05,.52,.5),'.05 .2 .9')
-    if scenario==3:s+=box('red_platform',(7.6,2.65,.25),(1.05,.52,.5),'.9 .03 .03')
+    if scenario in [3,4]:s+=box('red_platform',(7.6,2.65,.25),(1.05,.52,.5),'.9 .03 .03')
     s+=box('gate_left',(4.9,3.65,1.25),(.12,.16,2.5),'.5 .2 .7')
     s+=box('gate_right',(6.2,3.65,1.25),(.12,.16,2.5),'.5 .2 .7')
     s+=box('gate_top',(5.55,3.65,2.5),(1.42,.16,.12),'.5 .2 .7')
@@ -72,5 +73,5 @@ def generate(blocked=False, cameras=True, scenario=None):
     return path
 
 if __name__=='__main__':
-    for scene in [1,2,3]:
-        for cameras in [False,True]: print(generate(scene==2,cameras,scene))
+    for scene in [1,2,3,4]:
+        for cameras in [False,True]: print(generate(scene in [2,4],cameras,scene))

@@ -41,11 +41,12 @@ def make_handler(executor):
                 self._json(403,{'error':'Use the app served by this gateway'});return
             try:
                 n=int(self.headers.get('Content-Length','0'))
-                limit=10_000_000 if path in {'/api/sim/save','/api/sim/reset'} else 500000
+                limit=10_000_000 if path in {'/api/sim/save','/api/sim/reset','/api/sim/scenario'} else 500000
                 if not 0<n<=limit:raise ValueError('Request body exceeds endpoint size limit')
                 req=json.loads(self.rfile.read(n))
                 if path=='/api/sim/run': result=executor.start(req)
-                elif path=='/api/sim/reset':
+                elif path in {'/api/sim/reset','/api/sim/scenario'}:
+                    if path.endswith('/scenario') and (type(req.get('scenario')) is not int or req['scenario'] not in {1,2,3,4}):raise ValueError('Scenario must be 1, 2, 3 or 4')
                     state=executor.state()
                     if state['active']:raise ValueError('Stop the mission before resetting Gazebo')
                     saved=None
@@ -55,7 +56,7 @@ def make_handler(executor):
                         if not isinstance(ui_events,list) or any(not isinstance(e,dict) or not str(e.get('message_type','')).startswith('CHAT_') for e in ui_events):raise ValueError('Invalid chat audit events')
                         artifact['events']=[*previous['events'],*ui_events];artifact['state']={'facts':state['facts'],'sensors':state['sensors'],'backend':state['transport']}
                         saved=str(save_session('session_logs/ros2_resets',artifact).relative_to(ROOT))
-                    result=executor.reset_world();result['saved_session']=saved
+                    result=executor.reset_world(scenario=req['scenario']) if path.endswith('/scenario') else executor.reset_world();result['saved_session']=saved
                 elif path=='/api/sim/stop': result=executor.cancel()
                 elif path=='/api/sim/decision': executor.human(req.get('action'));result={'status':'DECISION_RECEIVED'}
                 elif path=='/api/sim/save':

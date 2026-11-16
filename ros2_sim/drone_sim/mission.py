@@ -77,7 +77,7 @@ def validate_request(req):
     for g in goals:
         if g['predicate'] in objects and (not g['args'] or g['args'][0]!=objects[g['predicate']]):raise ValueError('World supports red_package and gate_1 only')
         if g['predicate']=='placed' and g['args'] not in [['red_package','blue_platform'],['red_package','red_platform']]:raise ValueError('Unsupported delivery platform')
-        if g['predicate']=='placed' and g['args'][1]=='red_platform' and os.environ.get('DRONE_SCENARIO')!='3':raise ValueError('Red platform requires Scenario 3')
+        if g['predicate']=='placed' and g['args'][1]=='red_platform' and os.environ.get('DRONE_SCENARIO') not in {'3','4'}:raise ValueError('Red platform requires Scenario 3 or 4')
         if g['predicate']=='at' and g['args'] not in (['drone','home'],['home']):raise ValueError('Only home terminal location is supported')
     if any(g['predicate']=='landed' for g in goals) or any(a.get('skill')=='LAND' for a in plan):raise ValueError('LAND is not commissioned: touchdown sensing is not implemented in this version')
     views=[g['args'][1] for g in goals if g['predicate']=='inspected' and len(g['args'])==2]
@@ -106,7 +106,7 @@ def validate_request(req):
     for c in spec.get('constraints',[]):
         if c.get('name')!='minimum_view_separation_deg' or not 0<float(c.get('params',{}).get('degrees',0))<=90:raise ValueError('Unsupported constraint; external executor must not silently ignore it')
     if supplied_tree:
-        try:validate_generated_tree(supplied_tree,spec,('blue_platform','red_platform') if os.environ.get('DRONE_SCENARIO')=='3' else ('blue_platform',))
+        try:validate_generated_tree(supplied_tree,spec,('blue_platform','red_platform') if os.environ.get('DRONE_SCENARIO') in {'3','4'} else ('blue_platform',))
         except ValueError as error:raise ValueError('Invalid behavior tree or authorized alternates: '+str(error))
     return copy.deepcopy(spec),copy.deepcopy(plan)
 
@@ -218,7 +218,8 @@ class Executor:
             'validation':{'status':'ACCEPTED','html_validation':getattr(self,'original_validation',None),'scope':'supported arguments, goal coverage, runtime geometry and observations'},'robot_plan':copy.deepcopy(self.execution_tree) if reason=='INITIAL' else build_tree(spec,plan),'nominal_plan':copy.deepcopy(plan),
             'pddl':self.original_pddl if self.revision==1 else '; Recovery executed by policy controller; no solver-generated recovery PDDL.\n','state':self.transport.snapshot()})
 
-    def reset_world(self):
+    def reset_world(self,scenario=None):
+        if scenario is not None and (type(scenario) is not int or scenario not in {1,2,3,4}):raise ValueError('Scenario must be 1, 2, 3 or 4')
         with self.lock:
             if self.active or self.resetting:raise ValueError('Stop the mission before resetting the world')
             if not callable(getattr(self.transport,'reset_world',None)):raise ValueError('This transport does not support world reset')
@@ -226,8 +227,9 @@ class Executor:
         try:
             if self.thread:self.thread.join(timeout=3)
             if self.thread and self.thread.is_alive():raise RuntimeError('Execution thread has not stopped')
-            self.transport.velocity([0,0,0]);self.transport.clear_observations()
-            evidence=self.transport.reset_world()
+            self.transport.velocity([0,0,0]);self.transport.clear_observations(preserve_feedback=True)
+            evidence=self.transport.reset_world() if scenario is None else self.transport.reset_world(scenario=scenario)
+            if scenario is not None:os.environ['DRONE_SCENARIO']=str(scenario)
             state=self.transport.snapshot()
             if not state['pose_received'] or time.monotonic()-state['pose_received']>self.config['sensor_timeout']:raise RuntimeError('Fresh odometry missing after reset')
             with self.lock:
@@ -302,6 +304,22 @@ class Executor:
             time.sleep(.05)
         self.command([0,0,0]);raise RuntimeError('WAYPOINT_TIMEOUT: '+str(dest))
 
+    def survey_gate(self):
+        # A generated tree may test a gate condition before an explicit NAVIGATE.
+        # Obtain evidence at the inspection pose instead of testing from pickup.
+        self.event('GATE_SURVEY_STARTED',survey_pose=[5.55,2.8,1.6])
+        self.heading=math.pi/2
+        self.move([5.55,2.8,1.6]);self.hold(.6)
+        deadline=time.monotonic()+3
+        while True:
+            try:
+                clear=self.gate_clear()
+                self.event('GATE_SURVEY_RESULT',gate_clear=clear,status=self.transport.snapshot())
+                return clear
+            except RuntimeError as error:
+                if str(error) not in {'GATE_CLEAR_UNKNOWN','STALE_GATE_SENSOR'} or time.monotonic()>=deadline:raise
+                self.hold(.2)
+
     def gate_clear(self):
         s=self.sense();now=time.monotonic()
         if any(now-s['semantic_received'].get(c,0)>self.config['sensor_timeout'] for c in ['down','front']):raise RuntimeError('STALE_GATE_SENSOR')
@@ -334,7 +352,7 @@ class Executor:
             if loc=='target_loc':
                 p=self.observed('red_package',10)['position'];self.move([p[0],p[1],1.6])
             elif loc=='gate_loc':
-                self.move([5.55,2.8,1.6]);self.heading=math.pi/2;self.hold(.6)
+                self.survey_gate()
             elif loc in ['blue_platform','red_platform']:self.move([7.6,4.15 if loc=='blue_platform' else 2.65,1.6])
             elif loc=='home':self.move(cfg['home'])
         elif k=='PICK' and getattr(self.transport,'learned_package',False):
@@ -351,8 +369,7 @@ class Executor:
             self.facts['holding']=True;self.facts['picked']=True;self.event('GRASP_EVIDENCE',attachment='attached',before=self.target,after=lifted)
             self.move([d[0],d[1],1.6])
         elif k=='TRAVERSE_GATE':
-            self.heading=math.pi/2;self.hold(.6)
-            if not self.gate_clear():raise RuntimeError('GATE_BLOCKED')
+            if not self.survey_gate():raise RuntimeError('GATE_BLOCKED')
             self.move([5.55,2.95,1.6]);before=self.sense()['position'];self.goto([5.55,4.35,1.6]);after=self.sense()['position']
             if not(before[1]<3.3 and after[1]>4 and abs(after[0]-5.55)<.2):raise RuntimeError('TRAVERSAL_NOT_VERIFIED')
             self.facts['traversed']=True;self.event('TRAVERSAL_EVIDENCE',before=before,after=after)
@@ -384,15 +401,34 @@ class Executor:
         self.goto([p[0],p[1],p[2]+cfg['grasp']['offset']]);self.hold(.4)
         d=self.sense()['position']
         if distance(d[:2],p[:2])>cfg['grasp']['xy_tolerance'] or abs(d[2]-p[2]-cfg['grasp']['offset'])>cfg['grasp']['z_tolerance']:raise RuntimeError('GRASP_ALIGNMENT_FAILED')
-        # During near-contact occlusion, use the locked visual estimate + odometry,
-        # then verify the attachment joint remains attached throughout a test lift.
+        # A joint acknowledgement alone does not prove the payload is attached.
+        # Bound the test lift and independently observe the package rising.
         self.transport.grip(True);self.wait_gripper('attached');before=list(self.sense()['position'])
-        self.goto([before[0],before[1],before[2]+cfg['grasp']['test_lift']]);self.hold(.5)
-        after=self.sense()['position']
-        if self.sense()['gripper']!='attached' or after[2]-before[2]<.18:raise RuntimeError('TEST_LIFT_FAILED')
+        try:
+            self.goto([before[0],before[1],before[2]+cfg['grasp']['test_lift']],timeout=8)
+            self.hold(.5);after=self.sense()['position']
+            if self.sense()['gripper']!='attached' or after[2]-before[2]<.18:raise RuntimeError('TEST_LIFT_FAILED')
+            lifted=self.verify_payload_lift(p,before)
+        except RuntimeError:
+            self.transport.grip(False)
+            # Remove unloaded payload feedforward before safe recovery. Never set
+            # holding/picked when the package has not passed the lift check.
+            if not self.stop.is_set():self.wait_gripper('detached')
+            raise
         self.facts['holding']=True;self.facts['picked']=True
-        self.event('GRASP_EVIDENCE',attachment='attached',localization_source='learned_rgbd',verification_source='attachment_feedback_and_odometry_test_lift',drone_before=before,drone_after=after,package_pregrasp=p)
+        self.event('GRASP_EVIDENCE',attachment='attached',localization_source='learned_rgbd',verification_source='learned_rgbd_payload_motion_and_attachment_feedback',drone_before=before,drone_after=after,package_pregrasp=p,package_after_lift=lifted)
         self.move([after[0],after[1],1.6])
+
+    def verify_payload_lift(self,package_before,drone_before,timeout=3):
+        barrier=time.monotonic();deadline=barrier+timeout
+        while time.monotonic()<deadline:
+            state=self.sense();obj=state['objects'].get('red_package')
+            if obj and obj.get('source')=='learned_rgbd' and obj['received']>barrier:
+                p=obj['position'];d=state['position'];offset=drone_before[2]-package_before[2]
+                if state['gripper']=='attached' and p[2]-package_before[2]>=.18 and distance(d[:2],p[:2])<.12 and abs(d[2]-p[2]-offset)<.12:
+                    return list(p)
+            self.hold(.15)
+        raise RuntimeError('GRASP_PAYLOAD_NOT_VERIFIED: no fresh RGB-D evidence that package rose with drone')
 
     def wait_gripper(self,expected):
         end=time.monotonic()+4
@@ -479,7 +515,7 @@ class Executor:
                         self.event('ACTION_RESULT',action=a,result='FAILED',reason=str(error));raise
                 def condition(predicate):
                     failed_action[0]={'skill':'TRAVERSE_GATE','args':['gate_1']}
-                    clear=self.gate_clear()
+                    clear=self.survey_gate()
                     return clear if predicate=='gate_clear' else not clear
                 try:
                     if not execute_tree(getattr(self,'execution_tree',None) or build_tree(self.spec,plan),act,condition,self.event):raise RuntimeError('GATE_BLOCKED')

@@ -16,7 +16,7 @@
     el('externalControls').hidden=!external();el('simConnection').hidden=!external();
     const scene=external()&&el('externalView').value!=='map';
     canvas.hidden=scene;el('externalScene').hidden=!scene;el('simLegend').hidden=scene;
-    el('simHint').textContent=external()?'Gazebo is authoritative. Restart the launcher to change scenario. Choose Telemetry map when rendering is disabled.':'EDIT: drag any object in the browser world.';
+    el('simHint').textContent=external()?'Gazebo is authoritative. Select a scenario while idle to load its Gazebo geometry. Choose Telemetry map when rendering is disabled.':'EDIT: drag any object in the browser world.';
   }
   el('externalView').onchange=viewMode;
   function summary(s){
@@ -27,8 +27,10 @@
     el('simConnection').className='badge '+(s.connected?'good':'warn');
     el('externalStatus').textContent=JSON.stringify({status:s.status,transport:s.transport,pose_age_seconds:s.pose_age_seconds,facts:s.facts,sensors:s.sensors},null,2);
     el('externalHuman').hidden=s.status!=='WAITING_FOR_HUMAN';
-    if(external())for(const id of ['scenario','modeBtn','observeBtn','battery'])el(id).disabled=true;
+    if(external())for(const id of ['modeBtn','observeBtn','battery'])el(id).disabled=true;
     if(external()){
+      el('scenario').disabled=!s.reset_supported||s.active||running||s.status==='RESETTING';
+      if(!running)el('scenario').value=String(s.scenario);
       el('resetWorldBtn').disabled=!s.reset_supported||s.active||running||s.status==='RESETTING';
       el('resetWorldBtn').title=s.reset_supported?'Reset the Gazebo world; keep the original Robot Plan':'Restart the gateway to enable external world reset';
       setExecutionState(s.status);
@@ -56,14 +58,14 @@
       }
     }
     if(external()){
-      if(s.scenario===3)world.redPlatform={id:'red_platform',type:'platform',x:760,y:255,w:105,h:52};else delete world.redPlatform;
+      if([3,4].includes(s.scenario))world.redPlatform={id:'red_platform',type:'platform',x:760,y:255,w:105,h:52};else delete world.redPlatform;
       el('redPlatformLegend').hidden=!world.redPlatform;
     }
     if(external()&&p){
       world.drone.x=p[0]*100;world.drone.y=520-p[1]*100;world.drone.heading=-s.sensors.yaw;
       const target=s.sensors.objects.red_package;
       if(target){world.target.x=100*target.position[0];world.target.y=520-100*target.position[1];}
-      const blocker=s.sensors.objects.gate_blocker;if(blocker)world.gateObstacle={id:'gate_blocker',type:'obstacle',x:100*blocker.position[0],y:520-100*blocker.position[1],w:90,h:25};
+      const blocker=s.sensors.objects.gate_blocker;if(![2,4].includes(s.scenario))delete world.gateObstacle;else if(blocker)world.gateObstacle={id:'gate_blocker',type:'obstacle',x:100*blocker.position[0],y:520-100*blocker.position[1],w:90,h:25};
       el('beliefPanel').textContent=JSON.stringify(s.facts,null,2);
       el('truthPanel').textContent=`External telemetry projection. Altitude: ${p[2].toFixed(2)} m. Browser geometry is a reference map; Gazebo is authoritative.`;
       for(const camera of ['front','down','external'])if(s.sensors.cameras[camera])el(camera+'Image').src='/api/sim/camera/'+camera+'?t='+Date.now();
@@ -80,7 +82,7 @@
         }
         if(!latest.active){
           log('External outcome: '+latest.status,latest.status==='MISSION_COMPLETED'?'good':'warn');
-          session.outcome=latest.status;setExecutionState(latest.status);externalRun=null;running=false;setRunControls(false);el('executionBackend').disabled=false;el('runBtn').disabled=true;for(const id of ['scenario','modeBtn','observeBtn','battery'])el(id).disabled=true;
+          session.outcome=latest.status;setExecutionState(latest.status);externalRun=null;running=false;setRunControls(false);el('executionBackend').disabled=false;el('runBtn').disabled=true;for(const id of ['modeBtn','observeBtn','battery'])el(id).disabled=true;
         }
       }
     }catch(e){el('simConnection').textContent='GATEWAY UNAVAILABLE';if(external()){el('contractPanel').textContent='Gateway unavailable — live runtime checks unavailable.';el('batteryValue').textContent='Unavailable';el('batteryNote').textContent=' — gateway disconnected';}
@@ -111,20 +113,23 @@
     const handler=canvas[name];canvas[name]=e=>{if(!external())handler(e);};
   }
   el('observeBtn').onclick=()=>external()?refresh():browserObserve();
-  el('scenario').onchange=()=>{if(!external())browserScenario();};
-  el('resetWorldBtn').onclick=async()=>{
+  el('scenario').onchange=()=>external()?resetExternal(Number(el('scenario').value)):browserScenario();
+  el('resetWorldBtn').onclick=()=>external()?resetExternal():browserReset();
+  async function resetExternal(scenario){
     if(!external())return browserReset();
     if(running||latest?.active){log('Stop the mission before resetting Gazebo.','warn');return;}
     running=true;setExecutionState('RESETTING');setRunControls(true);el('executionBackend').disabled=true;
     try{
-      const result=await api('reset',{ui_events:session.events.filter(e=>e.message_type?.startsWith('CHAT_'))});
+      const result=await api(scenario?'scenario':'reset',{...(scenario?{scenario}:{}),ui_events:session.events.filter(e=>e.message_type?.startsWith('CHAT_'))});
       externalRun=null;lastSequence=0;shownRevision='';completedGoals=[];stopRequested=false;worldVersion++;
       verifiedState={version:0,observedAt:0,targetVisible:'UNKNOWN',targetLocalized:'UNKNOWN',gateClear:'UNKNOWN',holding:false,placed:false,atHome:false,inspectedViews:[],traversedGate:false,battery:null};
-      session.outcome='NOT_STARTED';running=false;setExecutionState('IDLE');setRunControls(false);
+      session.outcome='NOT_STARTED';running=false;
+      if(scenario){el('scenario').value=String(scenario);applyScenario({externalReset:true});}
+      setExecutionState('IDLE');setRunControls(false);
       if(reusablePlan)restoreReusablePlan(reusablePlan);else{el('runBtn').disabled=true;el('validateBtn').disabled=!missionSpec;for(const id of ['pddlBtn','planBtn'])el(id).disabled=validationResult?.status!=='ACCEPTED';}
       badge('worldVersionBadge','WORLD v'+worldVersion,'good');
       recordVersion('EXTERNAL_WORLD_RESET');
-      globalThis.DroneChat?.card('Gazebo world reset',reusablePlan?'Initial drone and package positions verified. The original Robot Plan is ready to run again.':'Initial drone and package positions verified. Generate a mission to begin.',{evidence:result});
+      globalThis.DroneChat?.card(scenario?'Gazebo scenario '+scenario+' loaded':'Gazebo world reset',reusablePlan?'Initial drone and package positions verified. The original Robot Plan is ready to run again.':'Initial drone and package positions verified. Generate a mission to begin.',{evidence:result});
       log('Gazebo reset verified; '+(result.saved_session?'previous episode saved to '+result.saved_session:'no previous episode')+'.','good');
       await refresh();
     }catch(e){running=false;setRunControls(false);el('runBtn').disabled=true;log('Gazebo reset failed: '+e.message,'bad');globalThis.DroneChat?.card('World reset failed',e.message,{kind:'problem'});}

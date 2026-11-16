@@ -180,14 +180,19 @@ gate posts/blockers, still use ideal semantics. Camera pose remains simulated mo
 
 Pickup aligns from a view at least 0.95 m above ground, logs a fresh learned estimate,
 locks it for the short final descent, checks odometry alignment, commands the physical
-attachment joint, and verifies attached feedback during a 0.3 m test lift. This is
-an attachment/odometry verification, not a visual claim about a partly occluded held
-package. Placement is checked again with learned RGB-D after release and ascent.
+attachment joint, and performs a bounded 0.3 m test lift. Pickup requires both attached
+feedback and fresh learned RGB-D observations showing that the package rose with the
+drone. A failed lift releases the joint before recovery. Placement is checked again
+with learned RGB-D after release and ascent.
 
 The static-rig dataset omitted the drone's own fingers/legs. The live worker therefore
 excludes depth ≤0.35 m and rejects package-center heights outside ±0.08 m of the
-supported 0.12 m ground / 0.62 m platform centers. These are explicit world-specific
-geometry assumptions, not calibrated confidence or general object localization.
+supported 0.12 m ground / 0.62 m platform centers during surface localization. Once
+joint feedback reports attached, a separate grasp-candidate mode allows depth >0.08 m
+and package centers within 0.12 m of the calibrated gripper height. This enables
+visual verification of the airborne package; the attached bit alone does not prove
+pickup. These are explicit world-specific geometry assumptions, not calibrated
+confidence or general object localization.
 Packages at arbitrary heights and realistic grasp mechanics need further work.
 
 Verified end-to-end native mission: `../results/rgbd_pickup_v2/report.json` and

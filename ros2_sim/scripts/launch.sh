@@ -2,7 +2,7 @@
 set -euo pipefail
 sim_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 scenario="${1:-1}"
-if [[ "$scenario" != 1 && "$scenario" != 2 && "$scenario" != 3 ]]; then echo 'Usage: launch.sh [1|2|3] [--headless|--render-headless]'; exit 2; fi
+if [[ "$scenario" != 1 && "$scenario" != 2 && "$scenario" != 3 && "$scenario" != 4 ]]; then echo 'Usage: launch.sh [1|2|3|4] [--headless|--render-headless]'; exit 2; fi
 if [[ -n "${2:-}" && "${2:-}" != --headless && "${2:-}" != --render-headless ]]; then echo 'Unknown rendering option'; exit 2; fi
 if [[ -n "${3:-}" && "${3:-}" != --rgbd ]]; then echo 'Unknown perception option; use --rgbd'; exit 2; fi
 # Check before starting Gazebo, bridges, or loading the RGB-D runtime.

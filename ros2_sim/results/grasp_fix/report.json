@@ -1,0 +1,46 @@
+{
+  "scope": "Two consecutive actual Gazebo/ROS2 RGB-D missions with episode reset between them; no live LLM request in this check.",
+  "runs": [
+    {
+      "run_id": "77cb569109754fd191fc911c08624eb9",
+      "outcome": "MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS",
+      "collision": false,
+      "interrupt_count": 0,
+      "placed_on": "red_platform",
+      "home_verified": true,
+      "verification_source": "learned_rgbd_payload_motion_and_attachment_feedback",
+      "package_before": [
+        7.090575504743975,
+        1.309053173875935,
+        0.1200000099423375
+      ],
+      "package_after_lift": [
+        7.111604426504062,
+        1.2921324560249063,
+        0.4065274988712696
+      ],
+      "session_file": "scene_4_77cb569109754fd191fc911c08624eb9.json"
+    },
+    {
+      "run_id": "d820ba31deaf4dd09632fbc2c3fc8d26",
+      "outcome": "MISSION_COMPLETED_WITH_AUTHORIZED_BYPASS",
+      "collision": false,
+      "interrupt_count": 0,
+      "placed_on": "red_platform",
+      "home_verified": true,
+      "verification_source": "learned_rgbd_payload_motion_and_attachment_feedback",
+      "package_before": [
+        7.086721109738395,
+        1.3145791533368905,
+        0.11997975613001804
+      ],
+      "package_after_lift": [
+        7.114637964681579,
+        1.2876574002064152,
+        0.40666235484983304
+      ],
+      "session_file": "scene_4_d820ba31deaf4dd09632fbc2c3fc8d26.json"
+    }
+  ],
+  "passed": true
+}

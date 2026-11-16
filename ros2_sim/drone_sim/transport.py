@@ -41,10 +41,12 @@ class Sensors:
         self.images={}
         self.learned_package=os.environ.get("DRONE_PACKAGE_PERCEPTION")=="rgbd"
 
-    def clear_observations(self):
+    def clear_observations(self,preserve_feedback=False):
         with self.lock:
+            feedback={k:self.state[k] for k in ['position','velocity','yaw','pose_received','gripper','gripper_received','imu_received']} if preserve_feedback else {}
             self.state.clear()
             self.state.update(position=None,velocity=[0,0,0],yaw=0.,pose_received=0.,objects={},gripper='unknown',gripper_received=0.,contacts=[],contact_received=0.,imu_received=0.,cameras={},semantic_received={},depth=None,sequence=0)
+            self.state.update(feedback)
             self.images.clear()
 
     def snapshot(self):
@@ -143,9 +145,9 @@ class Sensors:
 
 class GazeboTransport(Sensors):
     kind='gazebo_native'
-    def reset_world(self):
+    def reset_world(self,scenario=None):
         from drone_sim.world_reset import reset_gazebo
-        return reset_gazebo(self)
+        return reset_gazebo(self,scenario=scenario)
 
     def __init__(self):
         super().__init__()
@@ -184,9 +186,9 @@ class GazeboTransport(Sensors):
 
 class RosTransport(Sensors):
     kind='ros2'
-    def reset_world(self):
+    def reset_world(self,scenario=None):
         from drone_sim.world_reset import reset_gazebo
-        return reset_gazebo(self)
+        return reset_gazebo(self,scenario=scenario)
 
     def __init__(self):
         super().__init__()

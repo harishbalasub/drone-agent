@@ -73,7 +73,9 @@ bash ros2_sim/scripts/launch.sh 1 --headless
 bash ros2_sim/scripts/launch.sh 1 --render-headless
 ```
 
-Stop the launcher before changing scenario. Restart Gazebo **and the gateway for every fresh episode**; the package has physically moved and mission evidence must not carry over. Browser page refresh alone does not reset the external world. The HTML scenario selector is disabled for external execution; the launch argument selects the authoritative world. Dragging on the browser reference map cannot move Gazebo objects.
+While idle, use **World scenario** in the app to load Scenario 1 (clear gate), Scenario 2 (blocked gate), Scenario 3 (blue and red platforms), or Scenario 4 (blocked gate with blue and red platforms). The gateway adds/removes the actual Gazebo models and verifies the scene inventory and initial drone/package poses. A scenario change archives the previous episode and invalidates its plan. **Reset World** restarts the current episode while retaining the original plan; browser refresh alone does not reset Gazebo. Scenario changes and reset are disabled during a mission. The launch argument selects the initial scenario; dragging on the browser reference map cannot move Gazebo objects. Before removing a static scenario model, the reset service moves it below the scene and waits for camera updates so Gazebo does not retain a visible ghost in sensor images. Scenario 2 has only the blue platform; Scenario 3 has both platforms and a clear gate. Scenario 4 has both platforms and a blocked gate, allowing an authorized red-platform alternate. Launch it directly with `bash ros2_sim/scripts/launch.sh 4 --render-headless --rgbd`, or select it in the UI while idle.
+
+Gate conditions acquire fresh sensor evidence at a survey pose facing the gate, even when the generated behavior tree omits an explicit gate navigation step. Unknown/stale evidence remains an execution failure; it never authorizes traversal or a blocked-gate alternate. Gate sensing currently uses the logical camera adapter, while `--rgbd` uses learned RGB-D localization for the package.
 
 The launcher isolates its Gazebo partition (`drone_agent`) and DDS domain (`42`), starts Gazebo, the ROS bridge, semantic adapter, and gateway, and stops child processes on exit. Keep `ROS_DOMAIN_ID` and `GZ_PARTITION` consistent when launching components separately. The gateway binds to loopback; use SSH forwarding for another machine rather than opening an unauthenticated command port:
 
@@ -304,10 +306,23 @@ For example, `DRONE_PORT=8101 bash ros2_sim/scripts/launch.sh 1 --render-headles
 
 ### Reset Gazebo without regenerating the Robot Plan
 
-**Reset World** is enabled in external mode when the gateway supports verified reset and no mission is executing. It calls `/api/sim/reset`, preserves the completed episode under `session_logs/ros2_resets`, resets Gazebo through `/world/mission/control`, detaches the gripper, restores the initial drone/package poses and checks fresh dynamic-pose evidence. A failed reset blocks mission execution until reset succeeds. The UI retains the original Mission Spec and Behavior Tree, clears completed-goal claims and allows rerunning without an LLM call. Reset truth is not treated as mission package localization. RGB-D synchronization clears the previous episode on a backwards simulation-clock jump.
+**Reset World** is enabled in external mode when the gateway supports verified reset and no mission is executing. It calls `/api/sim/reset`, preserves the completed episode under `session_logs/ros2_resets`, preserves the running physics entities and simulation clock, detaches the gripper, restores the initial drone/package poses and checks fresh dynamic-pose evidence. A failed reset blocks mission execution until reset succeeds. The UI retains the original Mission Spec and Behavior Tree, clears completed-goal claims and allows rerunning without an LLM call. Reset truth is not treated as mission package localization. RGB-D synchronization clears the previous episode on a backwards simulation-clock jump.
 
 The LAN app must connect to the same gateway as the intended world. A gateway left running after a completed mission continues showing that completed world's package placement; reloading the HTML does not reset physics. For the current LAN setup, the fresh Scene 1 launcher is bound to `192.168.1.171:8100`, with `ROS_DOMAIN_ID=74` and `GZ_PARTITION=drone_lan_v3`.
 
 ### Chat-first mission controls
 
 The conversation composer starts with the default mission. Edit it and press **Send** to prepare the initial Mission Spec. Chat cards provide **Validate mission**, **Generate Behavior Tree** and **Run mission**; obsolete decisions are disabled. **Default mission** reloads the starter text without changing the current plan until submitted. The left sidebar now contains connection and LLM settings, compact status indicators and session logs. Optional PDDL generation lives in the PDDL tab. The original v2 interface is unchanged.
+
+
+Episode reset preserves Gazebo's running physics entities and simulation clock,
+detaches the gripper, and restores verified initial drone/package poses. It avoids
+`reset.all`, which can leave the detachable-joint plugin's reported attachment out
+of sync with the physics joint after repeated episodes. Camera and mission evidence
+are cleared independently; joint feedback is retained until detach is confirmed.
+
+RGB-D pickup bounds the test lift to eight seconds and requires fresh learned
+package observations showing that the package rose with the drone. An attached
+status bit alone cannot establish successful pickup. If the lift or payload check
+fails, the controller releases the joint before safe recovery and leaves the pickup
+goals unfulfilled.

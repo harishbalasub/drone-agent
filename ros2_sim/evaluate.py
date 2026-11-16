@@ -95,8 +95,8 @@ def run_episode(scenario=1,policy='abort',views=2,transport_kind='gazebo',config
         report.update(expected_outcome=expected,actual_outcome=outcome,backend=transport.kind,scenario=scenario,policy=policy,
             observed_views=len(facts['inspected']),collision=session['metrics']['collision'],duration_seconds=session['metrics']['duration_seconds'],
             perception_mode=executor.config['perception_mode'],controller=executor.config['controller'])
-        report['passed']=outcome==expected and not report['collision'] and (scenario==2 and policy=='abort' or len(facts['inspected'])==views)
-        if truth:report['passed']=report['passed'] and report['home_verified'] and (scenario==2 and policy=='abort' or report['placement_verified'])
+        report['passed']=outcome==expected and not report['collision'] and (scenario in [2,4] and policy=='abort' or len(facts['inspected'])==views)
+        if truth:report['passed']=report['passed'] and report['home_verified'] and (scenario in [2,4] and policy=='abort' or report['placement_verified'])
         (out/'session.json').write_text(json.dumps(session,indent=2));(out/'report.json').write_text(json.dumps(report,indent=2))
         print(json.dumps(report,indent=2),flush=True);return report
     finally:
@@ -113,7 +113,7 @@ def run_episode(scenario=1,policy='abort',views=2,transport_kind='gazebo',config
 
 
 def main():
-    p=argparse.ArgumentParser();p.add_argument('--scenario',type=int,choices=[1,2,3],default=1);p.add_argument('--policy',choices=['abort','bypass'],default='abort');p.add_argument('--views',type=int,choices=range(1,5),default=2);p.add_argument('--transport',choices=['gazebo','ros2'],default='gazebo');p.add_argument('--output');p.add_argument('--config');p.add_argument('--timeout',type=int,default=360)
+    p=argparse.ArgumentParser();p.add_argument('--scenario',type=int,choices=[1,2,3,4],default=1);p.add_argument('--policy',choices=['abort','bypass'],default='abort');p.add_argument('--views',type=int,choices=range(1,5),default=2);p.add_argument('--transport',choices=['gazebo','ros2'],default='gazebo');p.add_argument('--output');p.add_argument('--config');p.add_argument('--timeout',type=int,default=360)
     p.add_argument('--perception',choices=['ideal','rgbd'],default='ideal')
     a=p.parse_args();cfg=json.loads(Path(a.config).read_text()) if a.config else None
     r=run_episode(a.scenario,a.policy,a.views,a.transport,cfg,a.timeout,a.output,a.perception)
