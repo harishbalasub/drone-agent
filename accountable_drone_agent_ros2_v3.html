@@ -141,14 +141,14 @@ unresolved:{type:"array",items:{type:"object",additionalProperties:false,require
 requested_capabilities:{type:"array",items:{type:"string"}}}};
 
 MISSION_SCHEMA.properties.assumptions.items.required.push('constraint_name');
-MISSION_SCHEMA.properties.assumptions.items.properties.constraint_name={type:'string',enum:['','minimum_view_separation_deg']};
+MISSION_SCHEMA.properties.assumptions.items.properties.constraint_name={type:'string',enum:['none','minimum_view_separation_deg']};
 MISSION_SCHEMA.required.push('contingencies');
 MISSION_SCHEMA.properties.contingencies={type:'array',items:{type:'object',additionalProperties:false,required:['trigger','action','destination','authorization','source_text','fallback'],properties:{trigger:{type:'string',enum:['gate_not_clear']},action:{type:'string',enum:['BYPASS_GATE','ASK_HUMAN','ABORT_AND_RETURN_HOME']},destination:{type:'string',enum:['blue_platform','red_platform']},authorization:{type:'string',enum:['USER','SYSTEM_POLICY']},source_text:{type:'string'},fallback:{type:'string',enum:['ASK_HUMAN','ABORT_AND_RETURN_HOME']}}}};
 function compilerPrompt(goal){return `You are a mission compiler for an accountable drone agent.
 Use ONLY skills SEARCH, INSPECT, PICK, NAVIGATE, TRAVERSE_GATE, PLACE, RETURN_HOME, HOVER, LAND.
 Use ONLY goal predicates found(object), inspected(object,viewpoint), holding(object), traversed(gate), placed(object,location), at(location), landed(drone).
 Entity types: drone, object, location, region, viewpoint, gate, platform, obstacle.
-Link inspection-angle assumptions to constraint_name=minimum_view_separation_deg; use an empty constraint_name for unrelated assumptions. Do not list the same assumption twice.
+Link inspection-angle assumptions to constraint_name=minimum_view_separation_deg; use constraint_name=none for unrelated assumptions. Do not list the same assumption twice.
 Every USER goal needs exact source_text. Do not silently invent requirements; put ambiguity in unresolved[].
 If user requests unsupported behavior, include a short uppercase name in requested_capabilities.
 Use red_package, blue_platform, red_platform, gate_1, home, view_a, view_b when corresponding entities appear.
